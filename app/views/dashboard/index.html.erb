@@ -1,0 +1,14 @@
+<div class="container">
+  <h2 class="dashboard-header">Dashboard</h2>
+
+  <div class="property-grid">
+    <% @properties.each do |property| %>
+      <div class="property-card">
+        <h3 class="property-name"><%= property.name %></h3>
+        <p class="property-address"><%= property.address %></p>
+        <p class="checklist-count">Checklists: <strong><%= property.checklists.count %></strong></p>
+        <%= link_to "See Details", property_path(property), class: "btn btn-details" %>
+      </div>
+    <% end %>
+  </div>
+</div>

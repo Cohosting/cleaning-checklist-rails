@@ -1,0 +1,18 @@
+<h2 class="text-xl font-semibold mb-4">Checklists for <%= @property.name %></h2>
+
+<ul class="space-y-2">
+  <% @checklists.each do |checklist| %>
+    <li class="p-4 border rounded bg-gray-50 shadow-md">
+      <div class="flex justify-between items-center">
+        <span class="text-lg font-medium">
+          <%= link_to checklist.name, property_checklist_path(@property, checklist), class: "text-blue-500 hover:underline" %>
+        </span>
+        <span class="text-sm text-gray-600">
+          Status: <%= checklist.completed? ? '✅ Completed' : '⏳ In Progress' %>
+        </span>
+      </div>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'New Checklist', new_property_checklist_path(@property), class: "mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>

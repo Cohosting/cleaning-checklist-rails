@@ -1,0 +1,32 @@
+.property-container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .property-header {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .property-info {
+    color: #555;
+  }
+  
+  .checklist-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .checklist-item {
+    padding: 10px;
+    background: #f0f0f0;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+  

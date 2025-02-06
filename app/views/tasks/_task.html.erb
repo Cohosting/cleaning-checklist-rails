@@ -1,0 +1,7 @@
+<li class="task-item <%= 'task-completed' if task.completed? %>">
+  <%= form_with model: [@checklist.property, @checklist, task], method: :patch do |f| %>
+    <%= f.check_box :completed, checked: task.completed, onchange: "this.form.submit();" %>
+    <%= task.name %>
+  <% end %>
+  <%= link_to "❌", property_checklist_task_path(@checklist.property, @checklist, task), method: :delete, class: "delete-btn" %>
+</li>

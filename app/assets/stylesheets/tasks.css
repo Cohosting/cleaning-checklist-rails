@@ -1,0 +1,18 @@
+.task-container {
+    padding: 10px;
+    background: #eef;
+    border-radius: 5px;
+  }
+  
+  .task-item {
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .task-completed {
+    text-decoration: line-through;
+    color: gray;
+  }
+  
