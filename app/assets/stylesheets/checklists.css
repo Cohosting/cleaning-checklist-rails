@@ -1,29 +1,119 @@
-.checklist-container {
-    max-width: 700px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .checklist-header {
-    font-size: 22px;
-    font-weight: bold;
-  }
-  
-  .task-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .task-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px;
-    background: #f9f9f9;
-    border-radius: 5px;
-    margin-bottom: 5px;
-  }
-  
+.checklists-container {
+  max-width: 896px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: #4b5563;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.back-link:hover {
+  color: #111827;
+}
+
+.property-header {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.property-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.property-address {
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+}
+
+.checklists-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.checklists-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.new-checklist-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.new-checklist-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.checklists-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.checklist-card {
+  display: block;
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  text-decoration: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.checklist-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.checklist-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.checklist-info-list {
+  flex: 1;
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+
+.checklist-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.checklist-description {
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+}
+
+.checklist-meta {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}

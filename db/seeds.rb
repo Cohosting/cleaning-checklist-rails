@@ -1,37 +1,38 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-# Clear existing data
+# Delete records in the correct order to avoid foreign key constraints
+puts "🗑️ Deleting existing data..."
+JobTask.destroy_all
+Job.destroy_all
+Task.destroy_all
+Checklist.destroy_all
 Property.destroy_all
 
-# Create sample properties
-3.times do |i|
-  property = Property.create!(
-    name: "Property #{i + 1}",
-    address: "123 Street #{i + 1}, City"
-  )
+puts "🏡 Seeding properties..."
+property1 = Property.create!(name: "Oceanfront Villa", address: "123 Beach Ave")
+property2 = Property.create!(name: "Mountain Cabin", address: "456 Forest Rd")
 
-  # Create sample checklists for each property
-  2.times do |j|
-    checklist = property.checklists.create!(
-      name: "Cleaning Checklist #{j + 1}",
-      completed: false
-    )
+puts "📋 Seeding checklists..."
+checklist1 = Checklist.create!(property: property1, name: "Standard Cleaning")
+checklist2 = Checklist.create!(property: property1, name: "Deep Cleaning")
+checklist3 = Checklist.create!(property: property2, name: "Basic Cabin Cleanup")
 
-    # Create sample tasks for each checklist
-    3.times do |k|
-      checklist.tasks.create!(
-        name: "Task #{k + 1}",
-        completed: [true, false].sample
-      )
-    end
-  end
-end
+# ✅ Ensure default_checklist_id is properly assigned AFTER checklists are created
+property1.update!(default_checklist_id: checklist1.id)
+property2.update!(default_checklist_id: checklist3.id)
 
-puts "✅ Seeded sample data successfully!"
+puts "📝 Seeding tasks for checklists..."
+Task.create!(checklist: checklist1, name: "Vacuum floors")
+Task.create!(checklist: checklist1, name: "Change bed linens")
+Task.create!(checklist: checklist2, name: "Scrub kitchen")
+Task.create!(checklist: checklist2, name: "Sanitize bathrooms")
+Task.create!(checklist: checklist3, name: "Dust furniture")
+
+puts "🛠️ Seeding jobs..."
+job1 = Job.create!(property: property1, checklist_id: checklist1.id, date: Date.today)
+job2 = Job.create!(property: property2, checklist_id: checklist3.id, date: Date.today + 3)
+
+puts "✅ Seeding job tasks..."
+JobTask.create!(job: job1, name: "Vacuum floors", completed: false)
+JobTask.create!(job: job1, name: "Change bed linens", completed: false)
+JobTask.create!(job: job2, name: "Dust furniture", completed: false)
+
+puts "🎉 Seeding complete!"

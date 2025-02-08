@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
   def index
-    @properties = Property.includes(:checklists)
+    @properties = Property.all
   end
 end

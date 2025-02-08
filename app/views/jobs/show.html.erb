@@ -1,0 +1,64 @@
+<div class="job-details-container">
+  <!-- Navigation -->
+  <%= link_to property_jobs_path(@job.property), class: "back-link" do %>
+    <i class="fas fa-arrow-left mr-2"></i>
+    Back to Jobs
+  <% end %>
+
+  <!-- Header -->
+  <div class="property-header">
+    <div class="property-header-content">
+      <div class="property-info">
+        <h1><%= @job.property.name %></h1>
+        <p class="property-address">
+          <i class="fas fa-home mr-2"></i>
+          <%= @job.property.address %>
+        </p>
+      </div>
+      <div class="job-info">
+        <div class="job-date">
+          <i class="fas fa-calendar mr-2 text-gray-600"></i>
+          <span><%= @job.date.strftime("%Y-%m-%d") %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks Section -->
+  <div class="tasks-section">
+    <h2 class="tasks-title">Tasks</h2>
+    
+ <!-- Add New Task Form -->
+<%= form_with(url: property_job_job_tasks_path(@job.property, @job), 
+             method: :post,
+             local: true, 
+             class: "new-task-form") do |f| %>
+  <div class="form-group">
+    <%= f.text_field :name, 
+        placeholder: "Add a new task...", 
+        class: "task-input",
+        required: true %>
+    <%= button_tag type: 'submit', class: "add-task-btn" do %>
+      <i class="fas fa-plus mr-2"></i>
+      Add Task
+    <% end %>
+  </div>
+<% end %>
+
+    <!-- Tasks List -->
+    <div class="tasks-list">
+      <% @job.job_tasks.each do |task| %>
+        <div class="task-item">
+          <%= form_with(model: [@job.property, @job, task], local: true) do |f| %>
+            <%= f.check_box :completed, 
+                onchange: 'this.form.submit()', 
+                class: "task-checkbox" %>
+            <span class="<%= task.completed? ? 'task-completed' : 'task-pending' %>">
+              <%= task.name %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

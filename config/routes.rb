@@ -1,10 +1,15 @@
 Rails.application.routes.draw do
+
   root "dashboard#index" # Set dashboard as home
   resources :properties do
+    patch :make_default_checklist, on: :member
     resources :checklists do
-      resources :tasks, only: [:create, :update, :destroy]
+      resources :tasks, only: [:create, :destroy]  # Add this line
     end
-  end
+    resources :jobs, only: [:index, :new, :create, :show] do
+      resources :job_tasks, only: [:create, :update]
+    end
+   end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -1,18 +1,26 @@
-<div class="property-container">
-  <h2 class="property-header">Property: <%= @property.name %></h2>
-  <p class="property-info"><strong>Address:</strong> <%= @property.address %></p>
+<div class="container">
+  <h2>Property: <%= @property.name %></h2>
+  <p>Address: <%= @property.address %></p>
 
   <h3>Checklists</h3>
-  <ul class="checklist-list">
+  <ul>
     <% @property.checklists.each do |checklist| %>
-      <li class="checklist-item">
-        <%= link_to checklist.name, property_checklist_path(@property, checklist), class: "btn" %>
-        <span>
-          (<%= checklist.completed? ? '✅ Completed' : '⏳ In Progress' %>)
-        </span>
+      <li>
+        <strong><%= checklist.name %></strong>
+        <%= link_to "View", property_checklist_path(@property, checklist), class: "btn" %>
       </li>
     <% end %>
   </ul>
 
-  <%= link_to 'New Checklist', new_property_checklist_path(@property), class: "btn" %>
+  <h3>Jobs</h3>
+  <ul>
+    <% @property.jobs.each do |job| %>
+      <li>
+        <strong>Cleaning on <%= job.date %></strong>
+        <%= link_to "View Job", property_job_path(@property, job), class: "btn" %>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= link_to "New Job", new_property_job_path(@property), class: "btn btn-primary" %>
 </div>

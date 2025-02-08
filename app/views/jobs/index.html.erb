@@ -1,0 +1,49 @@
+<div class="jobs-container">
+  <!-- Header with Property Context -->
+  <div>
+    <%= link_to root_path, class: "back-link" do %>
+      <i class="fas fa-arrow-left mr-2"></i>
+      Back to Properties
+    <% end %>
+    
+    <div class="property-card">
+      <h1 class="property-name"><%= @property.name %></h1>
+      <p class="property-address">
+        <i class="fas fa-home mr-2"></i>
+        <%= @property.address %>
+      </p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="jobs-header">
+    <h2 class="jobs-title">Cleaning Jobs</h2>
+    <%= link_to new_property_job_path(@property), class: "new-job-btn" do %>
+      <i class="fas fa-plus mr-2"></i>
+      Schedule New Job
+    <% end %>
+  </div>
+
+  <!-- Jobs List -->
+  <div class="jobs-list">
+    <% @jobs.each do |job| %>
+      <%= link_to property_job_path(@property, job), class: "job-card" do %>
+        <div class="job-content">
+          <div class="job-info">
+            <i class="fas fa-calendar text-gray-600"></i>
+            <span class="job-date"><%= job.date.strftime("%Y-%m-%d") %></span>
+            <span class="status-badge <%= "status-#{job.status.downcase}" %>">
+              <%= job.status.humanize %>
+            </span>
+          </div>
+          <div class="flex items-center">
+            <span class="job-tasks">
+              <%= job.completed_tasks %>/<%= job.total_tasks %> tasks completed
+            </span>
+            <i class="fas fa-chevron-right text-gray-400"></i>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+<div class="container">
+  <h2>New Job for <%= @property.name %></h2>
+  <%= render "form" %>
+  <%= link_to "Back", property_jobs_path(@property), class: "btn" %>
+</div>

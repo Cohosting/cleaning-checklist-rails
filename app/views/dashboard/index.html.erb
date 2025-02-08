@@ -1,13 +1,39 @@
-<div class="container">
-  <h2 class="dashboard-header">Dashboard</h2>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Properties</h1>
+    <%= link_to new_property_path, class: "add-property-btn" do %>
+      <i class="fas fa-plus mr-2"></i>
+      Add Property
+    <% end %>
+  </div>
 
-  <div class="property-grid">
+  <div class="properties-grid">
     <% @properties.each do |property| %>
       <div class="property-card">
-        <h3 class="property-name"><%= property.name %></h3>
-        <p class="property-address"><%= property.address %></p>
-        <p class="checklist-count">Checklists: <strong><%= property.checklists.count %></strong></p>
-        <%= link_to "See Details", property_path(property), class: "btn btn-details" %>
+        <div class="property-header-list">
+          <div>
+            <h2 class="property-name"><%= property.name %></h2>
+            <p class="property-address">
+              <i class="fas fa-home"></i>
+              <%= property.address %>
+            </p>
+          </div>
+        </div>
+
+        <div class="property-actions">
+          <%= link_to property_jobs_path(property), class: "action-link" do %>
+            View Jobs (<%= property.jobs.count %>)
+          <% end %>
+          
+          <%= link_to property_checklists_path(property), class: "action-link" do %>
+            Checklist
+            <% if property.default_checklist.present? %>
+              (<%= property.checklists.count %>)
+            <% else %>
+              (None)
+            <% end %>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

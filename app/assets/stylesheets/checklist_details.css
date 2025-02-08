@@ -1,0 +1,145 @@
+.checklist-container {
+    max-width: 896px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4b5563;
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+  
+  .back-link:hover {
+    color: #111827;
+  }
+  
+  .context-header {
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .property-info {
+    margin-bottom: 1rem;
+  }
+  
+  .property-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+  
+  .property-address {
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+  }
+  
+  .checklist-info {
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+  }
+  
+  .checklist-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .checklist-description {
+    color: #4b5563;
+    margin-top: 0.25rem;
+  }
+  
+  .tasks-section {
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+  }
+  
+  .tasks-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+  
+  .new-task-form {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .task-input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+  }
+  
+  .task-input:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #3b82f6;
+  }
+  
+  .add-task-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .add-task-btn:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+  }
+  
+  .task-name {
+    color: #111827;
+  }
+  
+  .delete-task-btn {
+    color: #9ca3af;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+  
+  .delete-task-btn:hover {
+    color: #ef4444;
+  }
+  
+  .empty-state {
+    text-align: center;
+    color: #6b7280;
+    padding: 1rem 0;
+  }

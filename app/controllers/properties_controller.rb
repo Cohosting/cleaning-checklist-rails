@@ -1,5 +1,5 @@
 class PropertiesController < ApplicationController
-  before_action :set_property, only: %i[ show edit update destroy ]
+  before_action :set_property, only: %i[ show edit update destroy make_default_checklist ]
 
   # GET /properties or /properties.json
   def index
@@ -56,6 +56,18 @@ class PropertiesController < ApplicationController
       format.json { head :no_content }
     end
   end
+  def make_default_checklist
+   puts "make_default_checklist"
+   puts "params: #{params.inspect}" 
+   puts "params[:checklist_id]: #{params[:checklist_id]}"
+     @checklist = Checklist.find(params[:checklist_id])
+  
+    if @property.update(default_checklist: @checklist)
+      redirect_to property_checklists_path(@property), notice: "Default checklist updated!"
+    else
+      redirect_to property_checklists_path(@property), alert: "Failed to update default checklist."
+    end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -65,6 +77,6 @@ class PropertiesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def property_params
-      params.expect(property: [ :name, :address ])
+      params.expect(property: [ :name, :address, :checklist_id ])
     end
 end

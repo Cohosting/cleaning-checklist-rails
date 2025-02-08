@@ -1,25 +1,63 @@
 <div class="checklist-container">
-  <h2 class="checklist-header">Checklist: <%= @checklist.name %></h2>
-  <p><strong>Property:</strong> <%= @checklist.property.name %></p>
-
-  <h3>Tasks</h3>
-  <ul class="task-list">
-    <% @checklist.tasks.each do |task| %>
-      <li class="task-item">
-        <%= form_with model: [@checklist.property, @checklist, task], method: :patch do |f| %>
-          <%= f.check_box :completed, checked: task.completed, onchange: "this.form.submit();" %>
-          <%= task.name %>
-        <% end %>
-        <%= link_to "❌", property_checklist_task_path(@checklist.property, @checklist, task), method: :delete, class: "delete-btn" %>
-      </li>
-    <% end %>
-  </ul>
-
-  <h3>Add New Task</h3>
-  <%= form_with model: [@checklist.property, @checklist, Task.new] do |f| %>
-    <%= f.text_field :name, class: "border p-2 rounded w-full", placeholder: "Task name" %>
-    <%= f.submit "Add", class: "btn" %>
+  <!-- Navigation -->
+  <%= link_to property_checklists_path(@property), class: "back-link" do %>
+    <i class="fas fa-arrow-left mr-2"></i>
+    Back to Checklists
   <% end %>
 
-  <%= link_to 'Back to Checklists', property_path(@checklist.property), class: "btn" %>
+  <!-- Property and Checklist Context -->
+  <div class="context-header">
+    <div class="property-info">
+      <h1 class="property-name"><%= @property.name %></h1>
+      <p class="property-address">
+        <i class="fas fa-home mr-2"></i>
+        <%= @property.address %>
+      </p>
+    </div>
+    
+    <div class="checklist-info">
+      <h2 class="checklist-name"><%= @checklist.name %></h2>
+
+    </div>
+  </div>
+
+  <!-- Tasks Section -->
+  <div class="tasks-section">
+    <h3 class="tasks-title">Tasks</h3>
+
+    <!-- Add Task Form -->
+    <%= form_with(model: [@property, @checklist, Task.new], local: true, class: "new-task-form") do |f| %>
+      <div class="form-group">
+        <%= f.text_field :name, 
+            placeholder: "Add a task...",
+            class: "task-input",
+            required: true %>
+        <%= button_tag type: 'submit', class: "add-task-btn" do %>
+          <i class="fas fa-plus mr-2"></i>
+          Add Task
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Tasks List -->
+    <div class="tasks-list">
+      <% if @checklist.tasks.any? %>
+        <% @checklist.tasks.each do |task| %>
+          <div class="task-item">
+            <span class="task-name"><%= task.name %></span>
+            <%= button_to property_checklist_task_path(@property, @checklist, task),
+                method: :delete,
+                class: "delete-task-btn",
+                form: { style: 'display: inline-block' } do %>
+              <i class="fas fa-trash"></i>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="empty-state">
+          No tasks added yet. Add some tasks to your checklist.
+        </p>
+      <% end %>
+    </div>
+  </div>
 </div>

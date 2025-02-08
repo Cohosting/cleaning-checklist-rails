@@ -1,0 +1,142 @@
+.job-details-container {
+  max-width: 896px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: #4b5563;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.back-link:hover {
+  color: #111827;
+}
+
+.property-header {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+
+}
+
+.property-header-content {
+  display: flex;
+  align-items: center; /* Changed from center to flex-start */
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  width: 100%;
+
+}
+
+.property-info {
+  flex: 1;
+}
+
+.property-info h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.property-address {
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Added gap for icon spacing */
+}
+
+.job-info {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.job-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Added gap for icon spacing */
+  font-weight: 500;
+}
+.tasks-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.tasks-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.new-task-form {
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.task-input:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+}
+
+.add-task-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.add-task-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.tasks-list {
+  margin-top: 1rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.task-checkbox {
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.task-completed {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.task-pending {
+  color: #111827;
+}

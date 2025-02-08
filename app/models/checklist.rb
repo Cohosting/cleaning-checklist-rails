@@ -2,9 +2,13 @@ class Checklist < ApplicationRecord
   belongs_to :property
   has_many :tasks, dependent: :destroy
 
-  validates :name, presence: true
+  after_create :set_as_default_if_first
 
-  def completed?
-    tasks.any? && tasks.all?(&:completed)
+  private
+
+  def set_as_default_if_first
+    if property.default_checklist.nil?
+      property.update(default_checklist_id: id)
+    end
   end
 end

@@ -1,0 +1,6 @@
+<li>
+  <%= form_with model: [@job.property, @job, task], method: :patch do |f| %>
+    <%= f.check_box :completed, checked: task.completed, onchange: "this.form.submit();" %>
+    <%= task.name %>
+  <% end %>
+</li>

@@ -1,14 +1,5 @@
-<h2>New Checklist for <%= @property.name %></h2>
-
-<%= form_with model: [@property, @checklist] do |f| %>
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
-
-  <div>
-    <%= f.submit 'Create Checklist' %>
-  </div>
-<% end %>
-
-<%= link_to 'Back', property_checklists_path(@property) %>
+<div class="container">
+  <h2>New Checklist</h2>
+  <%= render "form" %>
+  <%= link_to "Back", property_checklists_path(@property), class: "btn" %>
+</div>
