@@ -1,0 +1,12 @@
+<h2>Cleaning Job Details</h2>
+<p><strong>Property:</strong> <%= @job.property.name %></p>
+<p><strong>Scheduled Date:</strong> <%= @job.date %></p>
+
+<!-- Listen for Turbo Stream updates -->
+<%= turbo_stream_from "job_#{@job.id}_tasks" %>
+
+<h3>Tasks</h3>
+<!-- Wrap the task list inside a container with an ID that matches the broadcast target -->
+<div id="job_tasks">
+  <%= render partial: "job_shares/job_tasks", locals: { job: @job } %>
+</div>

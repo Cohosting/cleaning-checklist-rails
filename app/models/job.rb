@@ -4,6 +4,7 @@ class Job < ApplicationRecord
   has_many :job_tasks, dependent: :destroy
 
   after_create :copy_tasks_from_checklist
+  before_create :generate_public_token
 
   def completed_tasks
     job_tasks.where(completed: true).count
@@ -20,6 +21,10 @@ class Job < ApplicationRecord
   end
 
   private
+
+  def generate_public_token
+    self.public_token = SecureRandom.hex(10) # Generates a 20-character token
+  end
 
   def copy_tasks_from_checklist
     checklist.tasks.each do |task|

@@ -20,6 +20,17 @@ class JobTasksController < ApplicationController
     end
   end
 
+def remove_image
+  # Ensure image_id is present in params
+  if params[:image_id].present?
+    image = @job_task.images.find(params[:image_id])
+    image.purge
+    redirect_to property_job_path(@job_task.job.property, @job_task.job), notice: "Image removed successfully."
+  else
+    redirect_to property_job_path(@job_task.job.property, @job_task.job), alert: "No image found to remove."
+  end
+end
+
   private
 
   def set_job
@@ -31,7 +42,7 @@ class JobTasksController < ApplicationController
   end
 
   def job_task_params
-    params.require(:job_task).permit(:completed)
+    params.require(:job_task).permit(:completed, images: [])
   end
 
   def create_job_task_params

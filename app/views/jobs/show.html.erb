@@ -47,18 +47,11 @@
 
     <!-- Tasks List -->
     <div class="tasks-list">
-      <% @job.job_tasks.each do |task| %>
-        <div class="task-item">
-          <%= form_with(model: [@job.property, @job, task], local: true) do |f| %>
-            <%= f.check_box :completed, 
-                onchange: 'this.form.submit()', 
-                class: "task-checkbox" %>
-            <span class="<%= task.completed? ? 'task-completed' : 'task-pending' %>">
-              <%= task.name %>
-            </span>
-          <% end %>
-        </div>
-      <% end %>
+
+  <%= render @job.job_tasks, job: @job %>
+
     </div>
+    <%= link_to "Share Job", job_share_url(@job.public_token), target: "_blank", rel: "noopener" %>
+
   </div>
 </div>

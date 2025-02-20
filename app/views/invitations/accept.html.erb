@@ -1,0 +1,12 @@
+<h1>Welcome! Set Your Password</h1>
+
+<%= form_with url: process_accept_invitations_path, method: :post do %>
+  <input type="hidden" name="token" value="<%= params[:token] %>">
+  
+  <div>
+    <label>Password</label>
+    <%= password_field_tag :password, required: true %>
+  </div>
+
+  <%= submit_tag "Join Organization" %>
+<% end %>

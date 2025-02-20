@@ -1,26 +1,44 @@
 Rails.application.routes.draw do
-
+  resources :upsells
   root "dashboard#index" # Set dashboard as home
+
+  # User authentication
+  resource :session, path: "user/signin", only: [:new, :create, :destroy]
+  resources :users, only: [:new, :create]
+  resources :passwords, param: :token
+
+  # Invitations
+  resources :invitations, only: [:create] do
+    get "accept", on: :collection
+    post "accept", on: :collection, to: "invitations#process_accept", as: "process_accept"
+  end
+  # Properties & Jobs
   resources :properties do
     patch :make_default_checklist, on: :member
     resources :checklists do
-      resources :tasks, only: [:create, :destroy]  # Add this line
+      resources :tasks, only: [:create, :destroy] 
     end
     resources :jobs, only: [:index, :new, :create, :show] do
-      resources :job_tasks, only: [:create, :update]
+      resources :job_tasks do
+        member do
+          delete :remove_image
+        end
+      end
     end
-   end
-  
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  end
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Public job sharing
+  resources :job_shares, only: [:show], param: :public_token
+
+  resources :upsells do
+    member do
+      post 'checkout'
+    end
+  end
+
+  # Webhooks
+  post "webhooks/stripe" => "webhooks#stripe"
+
+  # Health check
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

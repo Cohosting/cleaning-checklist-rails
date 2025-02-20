@@ -1,6 +1,33 @@
-<li>
-  <%= form_with model: [@job.property, @job, task], method: :patch do |f| %>
-    <%= f.check_box :completed, checked: task.completed, onchange: "this.form.submit();" %>
-    <%= task.name %>
+<div class="task-item">
+  <%= form_with(model: [job.property, job, job_task], local: true, html: { multipart: true }) do |f| %>
+    <%= f.check_box :completed, 
+        onchange: 'this.form.submit()', 
+        class: "task-checkbox" %>
+    
+    <span class="<%= job_task.completed? ? 'task-completed' : 'task-pending' %>">
+      <%= job_task.name %>
+    </span>
+
+    <!-- Image Upload Field -->
+    <div class="task-images">
+      <label>Attach Images:</label>
+      <%= f.file_field :images, multiple: true, direct_upload: true %>
+    </div>
+
+    <!-- Display Existing Images -->
+    <% if job_task.images.attached? %>
+      <div class="uploaded-images">
+        <% job_task.images.each do |image| %>
+          <div class="image-wrapper">
+            <%= image_tag image, size: "50x50" %>
+<%= button_to "Remove", 
+    remove_image_property_job_job_task_path(job_task.job.property, job_task.job, job_task, image_id: image.id), 
+    method: :delete, 
+    data: { confirm: "Are you sure?" }, 
+    class: "remove-image" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
-</li>
+</div>

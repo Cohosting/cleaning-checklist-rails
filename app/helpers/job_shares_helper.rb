@@ -1,0 +1,2 @@
+module JobSharesHelper
+end
