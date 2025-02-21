@@ -64,7 +64,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "tailwindcss-ruby", "~> 4.0"
+gem "tailwindcss-ruby", "3.4.13"
 
 gem 'stripe'
 gem "dockerfile-rails", ">= 1.7", :group => :development
+gem 'httparty'
+
+gem "mission_control-jobs"

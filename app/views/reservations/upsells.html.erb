@@ -1,0 +1,20 @@
+<h1 class="text-2xl font-bold mb-4">Upsell Page for Reservation</h1>
+<p class="text-lg mb-2">Property: <%= @property.name %></p>
+<p class="text-lg mb-4">Reservation ID: <%= @reservation.id %></p>
+
+<p class="text-lg font-semibold">Guest Information:</p>
+<p class="text-lg mb-2">Name: <%= @reservation.guest&.first_name %> <%= @reservation.guest&.last_name %></p>
+<p class="text-lg mb-2"><%= @reservation.guest&.email %></p>
+<p class="text-lg mb-4">Number: <%= @reservation.guest&.phone_numbers&.first %></p>
+ 
+<div class="space-y-4">
+  <% @upsells.each do |upsell| %>
+    <div class="p-4 border rounded-lg shadow-md">
+      <p class="text-xl font-semibold"><%= upsell.title %></p>
+      <p class="text-lg text-gray-700"><%= upsell.price %></p>
+      <p class="text-gray-600"><%= upsell.description %></p>
+<%= button_to 'Checkout', checkout_property_upsell_path(@property, upsell), method: :post, data: { turbo: false }, class: 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded' %>
+
+    </div>
+  <% end %>
+</div>

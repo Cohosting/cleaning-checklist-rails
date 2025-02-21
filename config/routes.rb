@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :upsells
   root "dashboard#index" # Set dashboard as home
 
   # User authentication
@@ -12,8 +11,21 @@ Rails.application.routes.draw do
     get "accept", on: :collection
     post "accept", on: :collection, to: "invitations#process_accept", as: "process_accept"
   end
+
   # Properties & Jobs
   resources :properties do
+    resources :reservations do
+      member do
+        get :upsells
+      end
+    end
+
+    resources :upsells do   
+      member do
+        post 'checkout'
+      end
+    end
+
     patch :make_default_checklist, on: :member
     resources :checklists do
       resources :tasks, only: [:create, :destroy] 
@@ -30,15 +42,12 @@ Rails.application.routes.draw do
   # Public job sharing
   resources :job_shares, only: [:show], param: :public_token
 
-  resources :upsells do
-    member do
-      post 'checkout'
-    end
-  end
-
   # Webhooks
   post "webhooks/stripe" => "webhooks#stripe"
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
+
+  # Mission control
+  mount MissionControl::Jobs::Engine, at: "/solid-jobs"
 end

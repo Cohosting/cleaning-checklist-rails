@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  platform: MyString
+  platform_id: MyString
+  guest: one
+  booking_date: 2025-02-21 08:56:45
+  arrival_date: 2025-02-21 08:56:45
+  departure_date: 2025-02-21 08:56:45
+  nights: 1
+  check_in: 2025-02-21 08:56:45
+  check_out: 2025-02-21 08:56:45
+  status: MyString
+  total_price: 9.99
+  currency: MyString
+
+two:
+  platform: MyString
+  platform_id: MyString
+  guest: two
+  booking_date: 2025-02-21 08:56:45
+  arrival_date: 2025-02-21 08:56:45
+  departure_date: 2025-02-21 08:56:45
+  nights: 1
+  check_in: 2025-02-21 08:56:45
+  check_out: 2025-02-21 08:56:45
+  status: MyString
+  total_price: 9.99
+  currency: MyString

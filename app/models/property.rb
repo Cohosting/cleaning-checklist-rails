@@ -4,11 +4,16 @@ class Property < ApplicationRecord
   
     # A property can have many checklists
     has_many :checklists, dependent: :destroy
+    has_many :upsells , dependent: :destroy
   
     # A property can have many jobs
     has_many :jobs, dependent: :destroy
+    has_many :reservations, dependent: :destroy
   
     # Validations
     validates :name, presence: true
     validates :address, presence: true
+
+
+
   end

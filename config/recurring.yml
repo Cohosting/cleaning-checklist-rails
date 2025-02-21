@@ -8,3 +8,11 @@
 #     command: "SoftDeletedRecord.due.delete_all"
 #     priority: 2
 #     schedule: at 5am every day
+development:
+  sync_all_reservations:
+    class: SyncAllReservationsJob
+    schedule: "every 1 minute"  
+  sync_properties:
+    class: SyncPropertiesJob
+    schedule: "every 1 minute"
+    

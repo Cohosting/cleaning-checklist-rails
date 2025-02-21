@@ -5,6 +5,7 @@
       <i class="fas fa-plus mr-2"></i>
       Add Property
     <% end %>
+    
   </div>
 
   <div class="properties-grid">
@@ -12,7 +13,7 @@
       <div class="property-card">
         <div class="property-header-list">
           <div>
-            <h2 class="property-name"><%= property.name %></h2>
+            <h2 class="property-name bg-red"><%= property.name %></h2>
             <p class="property-address">
               <i class="fas fa-home"></i>
               <%= property.address %>
@@ -32,6 +33,12 @@
             <% else %>
               (None)
             <% end %>
+          <% end %>
+                    <%= link_to property_reservations_path(property), class: "action-link" do %>
+            View reservation (<%= property.reservations.count %>)
+          <% end %>
+          <%= link_to property_upsells_path(property), class: "action-link" do %>
+            View upsell (<%= property.upsells.count %>)
           <% end %>
         </div>
       </div>

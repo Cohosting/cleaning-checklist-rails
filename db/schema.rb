@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_20_091207) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_21_091735) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -46,6 +46,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_091207) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["property_id"], name: "index_checklists_on_property_id"
+  end
+
+  create_table "guests", force: :cascade do |t|
+    t.string "hospitable_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "email"
+    t.json "phone_numbers"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hospitable_id"], name: "index_guests_on_hospitable_id", unique: true
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -102,7 +113,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_091207) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "default_checklist_id"
+    t.string "hospitable_id"
     t.index ["default_checklist_id"], name: "index_properties_on_default_checklist_id"
+    t.index ["hospitable_id"], name: "index_properties_on_hospitable_id", unique: true
+  end
+
+  create_table "reservations", force: :cascade do |t|
+    t.string "platform"
+    t.string "platform_id"
+    t.integer "guest_id", null: false
+    t.datetime "booking_date"
+    t.datetime "arrival_date"
+    t.datetime "departure_date"
+    t.integer "nights"
+    t.datetime "check_in"
+    t.datetime "check_out"
+    t.string "status"
+    t.decimal "total_price"
+    t.string "currency"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "property_id"
+    t.string "hospitable_reservation_id"
+    t.index ["guest_id"], name: "index_reservations_on_guest_id"
+    t.index ["platform_id"], name: "index_reservations_on_platform_id", unique: true
+    t.index ["property_id"], name: "index_reservations_on_property_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -131,6 +166,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_091207) do
     t.datetime "updated_at", null: false
     t.string "status"
     t.string "stripe_checkout_session_id"
+    t.integer "property_id", null: false
+    t.index ["property_id"], name: "index_upsells_on_property_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -152,6 +189,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_091207) do
   add_foreign_key "memberships", "users"
   add_foreign_key "organizations", "users", column: "owner_id"
   add_foreign_key "properties", "checklists", column: "default_checklist_id"
+  add_foreign_key "reservations", "guests"
+  add_foreign_key "reservations", "properties"
   add_foreign_key "sessions", "users"
   add_foreign_key "tasks", "checklists"
+  add_foreign_key "upsells", "properties"
 end
