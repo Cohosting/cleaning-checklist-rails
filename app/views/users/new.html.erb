@@ -1,37 +1,28 @@
-<h1>Sign Up</h1>
-
-<% if flash[:alert] %>
-  <div style="color: red;">
-    <%= flash[:alert] %>
-  </div>
-<% end %>
-
-<% if @user.errors.any? %>
-  <div style="color: red;">
-    <h3><%= pluralize(@user.errors.count, "error") %> prevented this signup:</h3>
-    <ul>
-      <% @user.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<%= form_with model: @user, url: users_path, method: :post do |f| %>
-  <% if @invitation %>
-    <p>You’ve been invited to join <strong><%= @invitation.organization.name %></strong>.</p>
-    <input type="hidden" name="token" value="<%= @invitation.token %>">
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">Sign Up</h1>
+  <% if @user.errors.any? %>
+    <div class="text-red-500 bg-red-100 border border-red-400 rounded p-2 mb-4">
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
   <% end %>
-
-  <div>
-    <label>Email</label>
-    <%= f.email_field :email_address, required: true %>
-  </div>
-
-  <div>
-    <label>Password</label>
-    <%= f.password_field :password, required: true %>
-  </div>
-
-  <%= f.submit "Sign Up" %>
-<% end %>
+  <%= form_with model: @user, url: signup_path(invitation_token: @invitation_token), local: true, class: "space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, "Email", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.email_field :email_address, readonly: @invitation_token.present?, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" %>
+    </div>
+    <div>
+      <%= form.label :password, "Password", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.password_field :password, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" %>
+    </div>
+    <div>
+      <%= form.label :password_confirmation, "Confirm Password", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.password_field :password_confirmation, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" %>
+    </div>
+    <%= form.hidden_field :invitation_token, value: @invitation_token %>
+    <%= form.submit "Sign Up", class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" %>
+  <% end %>
+</div>

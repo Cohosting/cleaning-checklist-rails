@@ -4,18 +4,22 @@ class User < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :organizations, through: :memberships
-
+  belongs_to :organization, optional: true # Directly uses organization_id
   has_many :sessions, dependent: :destroy
 
   
   validates :email_address, presence: true, uniqueness: true
 
-  after_commit :ensure_default_organization, on: :create
 
+
+    # Define permission check for inviting to an organization
+    def can_invite_to?(organization)
+      membership = memberships.find_by(organization: organization)
+      return false unless membership # User must be a member
+      membership.role == "admin" || organization.owner_id == id # Admins or owner can invite
+    end
   private
 
-  def ensure_default_organization
-    org = Organization.create!(name: "#{email_address}'s Organization", owner: self)
-    memberships.create!(organization: org, role: "owner")
-  end
+
+
 end

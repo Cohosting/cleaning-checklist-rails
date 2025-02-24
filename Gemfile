@@ -71,3 +71,5 @@ gem "dockerfile-rails", ">= 1.7", :group => :development
 gem 'httparty'
 
 gem "mission_control-jobs"
+
+gem 'letter_opener', group: :development

@@ -1,17 +1,20 @@
 Rails.application.routes.draw do
+  get "organizations/show"
   root "dashboard#index" # Set dashboard as home
+  # Sign-up routes (UsersController)
+  get "/signup", to: "users#new", as: :signup
+  post "/signup", to: "users#create"
 
-  # User authentication
-  resource :session, path: "user/signin", only: [:new, :create, :destroy]
-  resources :users, only: [:new, :create]
+  # Sign-in/Sign-out routes (SessionsController)
+  get "/signin", to: "sessions#new", as: :signin
+  post "/signin", to: "sessions#create"
+  delete "/signout", to: "sessions#destroy", as: :signout
   resources :passwords, param: :token
 
   # Invitations
-  resources :invitations, only: [:create] do
-    get "accept", on: :collection
-    post "accept", on: :collection, to: "invitations#process_accept", as: "process_accept"
+  resources :invitations, only: [] do
+    get :accept, on: :collection
   end
-
   # Properties & Jobs
   resources :properties do
     resources :reservations do
@@ -37,6 +40,10 @@ Rails.application.routes.draw do
         end
       end
     end
+  end
+
+  resources :organizations do
+    resources :invitations, only: :create
   end
 
   # Public job sharing

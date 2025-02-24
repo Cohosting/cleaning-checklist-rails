@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_21_091735) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -65,7 +65,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_21_091735) do
     t.integer "organization_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "role", default: "cleaner", null: false
     t.index ["organization_id"], name: "index_invitations_on_organization_id"
+    t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
   create_table "job_tasks", force: :cascade do |t|
@@ -175,7 +177,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_21_091735) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "organization_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["organization_id"], name: "index_users_on_organization_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -194,4 +198,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_21_091735) do
   add_foreign_key "sessions", "users"
   add_foreign_key "tasks", "checklists"
   add_foreign_key "upsells", "properties"
+  add_foreign_key "users", "organizations"
 end
