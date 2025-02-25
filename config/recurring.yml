@@ -1,13 +1,11 @@
 # production:
-#   periodic_cleanup:
-#     class: CleanSoftDeletedRecordsJob
-#     queue: background
-#     args: [ 1000, { batch_size: 500 } ]
-#     schedule: every hour
-#   periodic_command:
-#     command: "SoftDeletedRecord.due.delete_all"
-#     priority: 2
-#     schedule: at 5am every day
+#   sync_all_reservations:
+#     class: SyncAllReservationsJob
+#     schedule: "every 5 minute"  
+#   sync_properties:
+#     class: SyncPropertiesJob
+#     schedule: "every 5 minute"
+
 development:
   sync_all_reservations:
     class: SyncAllReservationsJob
@@ -15,4 +13,3 @@ development:
   sync_properties:
     class: SyncPropertiesJob
     schedule: "every 1 minute"
-    
