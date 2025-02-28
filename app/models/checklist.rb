@@ -1,14 +1,7 @@
 class Checklist < ApplicationRecord
-  belongs_to :property
-  has_many :tasks, dependent: :destroy
-
-  after_create :set_as_default_if_first
-
-  private
-
-  def set_as_default_if_first
-    if property.default_checklist.nil?
-      property.update(default_checklist_id: id)
-    end
-  end
+  belongs_to :organization
+  has_many :sections, -> { order(position: :asc) }, dependent: :destroy
+  has_many :tasks, through: :sections
+  
+  validates :title, presence: true
 end

@@ -1,0 +1,2 @@
+module SectionGroupsHelper
+end

@@ -1,0 +1,16 @@
+
+<% 
+  total_tasks = section.tasks.count
+  completed_tasks = section.tasks.where(completed: true).count
+  progress_percentage = total_tasks > 0 ? (completed_tasks.to_f / total_tasks * 100).round : 0
+%>
+
+<div>
+  <div class="flex justify-between text-sm text-gray-600 mb-1">
+    <span><%= completed_tasks %>/<%= total_tasks %> completed</span>
+    <span><%= progress_percentage %>%</span>
+  </div>
+  <div class="w-full bg-gray-200 rounded-full h-2">
+    <div class="bg-blue-500 h-2 rounded-full" style="width: <%= progress_percentage %>%"></div>
+  </div>
+</div>

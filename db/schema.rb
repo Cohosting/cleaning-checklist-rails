@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -40,12 +40,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
   end
 
   create_table "checklists", force: :cascade do |t|
-    t.integer "property_id", null: false
-    t.string "name", null: false
+    t.string "name"
     t.boolean "completed", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["property_id"], name: "index_checklists_on_property_id"
+    t.string "title", null: false
+    t.text "description"
+    t.integer "organization_id", null: false
+    t.index ["organization_id"], name: "index_checklists_on_organization_id"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "organization_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
   create_table "guests", force: :cascade do |t|
@@ -142,6 +153,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
     t.index ["property_id"], name: "index_reservations_on_property_id"
   end
 
+  create_table "section_groups", force: :cascade do |t|
+    t.integer "section_id", null: false
+    t.integer "group_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_section_groups_on_group_id"
+    t.index ["section_id"], name: "index_section_groups_on_section_id"
+  end
+
+  create_table "sections", force: :cascade do |t|
+    t.string "title"
+    t.integer "position"
+    t.integer "checklist_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["checklist_id"], name: "index_sections_on_checklist_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -152,12 +182,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.integer "checklist_id", null: false
-    t.string "name", null: false
+    t.string "name"
     t.boolean "completed", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["checklist_id"], name: "index_tasks_on_checklist_id"
+    t.string "content"
+    t.integer "position"
+    t.integer "section_group_id"
+    t.index ["section_group_id"], name: "index_tasks_on_section_group_id"
   end
 
   create_table "upsells", force: :cascade do |t|
@@ -184,7 +216,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "checklists", "properties"
+  add_foreign_key "checklists", "organizations"
+  add_foreign_key "groups", "organizations"
   add_foreign_key "invitations", "organizations"
   add_foreign_key "job_tasks", "jobs"
   add_foreign_key "jobs", "checklists"
@@ -195,8 +228,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_24_062155) do
   add_foreign_key "properties", "checklists", column: "default_checklist_id"
   add_foreign_key "reservations", "guests"
   add_foreign_key "reservations", "properties"
+  add_foreign_key "section_groups", "groups"
+  add_foreign_key "section_groups", "sections"
+  add_foreign_key "sections", "checklists"
   add_foreign_key "sessions", "users"
-  add_foreign_key "tasks", "checklists"
+  add_foreign_key "tasks", "section_groups"
   add_foreign_key "upsells", "properties"
   add_foreign_key "users", "organizations"
 end

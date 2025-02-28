@@ -1,38 +1,85 @@
-# # Delete records in the correct order to avoid foreign key constraints
-# puts "🗑️ Deleting existing data..."
-# JobTask.destroy_all
-# Job.destroy_all
-# Task.destroy_all
-# Checklist.destroy_all
-# Property.destroy_all
+# Clear existing data
+Task.delete_all
+SectionGroup.delete_all
+Section.delete_all
+Checklist.delete_all
+Group.delete_all
+Organization.delete_all
+User.delete_all
 
-# puts "🏡 Seeding properties..."
-# property1 = Property.create!(name: "Oceanfront Villa", address: "123 Beach Ave")
-# property2 = Property.create!(name: "Mountain Cabin", address: "456 Forest Rd")
+# Create a user
+user = User.create!(
+  email_address: "admin@example.com",
+  password: "password",
+  password_digest: BCrypt::Password.create("password")
+)
 
-# puts "📋 Seeding checklists..."
-# checklist1 = Checklist.create!(property: property1, name: "Standard Cleaning")
-# checklist2 = Checklist.create!(property: property1, name: "Deep Cleaning")
-# checklist3 = Checklist.create!(property: property2, name: "Basic Cabin Cleanup")
+# Create an organization
+organization = Organization.create!(
+  name: "Example Home Services",
+  owner: user
+)
 
-# # ✅ Ensure default_checklist_id is properly assigned AFTER checklists are created
-# property1.update!(default_checklist_id: checklist1.id)
-# property2.update!(default_checklist_id: checklist3.id)
+# Create a few groups
+bedroom = organization.groups.create!(name: "Bedroom", description: "Tasks related to bedroom cleaning")
+bathroom = organization.groups.create!(name: "Bathroom", description: "Bathroom maintenance")
+kitchen = organization.groups.create!(name: "Kitchen", description: "Kitchen cleaning")
+interior = organization.groups.create!(name: "Interior", description: "General interior maintenance and cleaning")
 
-# puts "📝 Seeding tasks for checklists..."
-# Task.create!(checklist: checklist1, name: "Vacuum floors")
-# Task.create!(checklist: checklist1, name: "Change bed linens")
-# Task.create!(checklist: checklist2, name: "Scrub kitchen")
-# Task.create!(checklist: checklist2, name: "Sanitize bathrooms")
-# Task.create!(checklist: checklist3, name: "Dust furniture")
+# Create one checklist
+checklist = organization.checklists.create!(
+  title: "Property Turnover Checklist",
+  description: "Checklist for preparing a property between guests"
+)
 
-# puts "🛠️ Seeding jobs..."
-# job1 = Job.create!(property: property1, checklist_id: checklist1.id, date: Date.today)
-# job2 = Job.create!(property: property2, checklist_id: checklist3.id, date: Date.today + 3)
+# Create sections
+cleaning = checklist.sections.create!(title: "Cleaning")
+inspection = checklist.sections.create!(title: "Inspection")
+interior_section = checklist.sections.create!(title: "Interior Maintenance")
 
-# puts "✅ Seeding job tasks..."
-# JobTask.create!(job: job1, name: "Vacuum floors", completed: false)
-# JobTask.create!(job: job1, name: "Change bed linens", completed: false)
-# JobTask.create!(job: job2, name: "Dust furniture", completed: false)
+# Assign groups to sections
+cleaning_bedroom = cleaning.section_groups.create!(group: bedroom)
+cleaning_bathroom = cleaning.section_groups.create!(group: bathroom)
+cleaning_kitchen = cleaning.section_groups.create!(group: kitchen)
 
-# puts "🎉 Seeding complete!"
+inspection_general = inspection.section_groups.create!(group: bedroom)
+inspection_bathroom = inspection.section_groups.create!(group: bathroom)
+
+interior_group = interior_section.section_groups.create!(group: interior)
+
+# Add tasks to sections
+cleaning_bedroom.tasks.create!([
+  { content: "Change bed linens", completed: false },
+  { content: "Dust surfaces", completed: false },
+  { content: "Vacuum floor", completed: false }
+])
+
+cleaning_bathroom.tasks.create!([
+  { content: "Clean shower", completed: false },
+  { content: "Restock toiletries", completed: false },
+  { content: "Disinfect toilet", completed: false }
+])
+
+cleaning_kitchen.tasks.create!([
+  { content: "Wipe down countertops", completed: false },
+  { content: "Clean inside microwave", completed: false },
+  { content: "Take out trash", completed: false }
+])
+
+inspection_general.tasks.create!([
+  { content: "Check for damages", completed: false },
+  { content: "Ensure all lightbulbs work", completed: false }
+])
+
+inspection_bathroom.tasks.create!([
+  { content: "Check plumbing for leaks", completed: false }
+])
+
+interior_group.tasks.create!([
+  { content: "Dust all vents and fans", completed: false },
+  { content: "Check and replace air filters if needed", completed: false },
+  { content: "Inspect and clean windows", completed: false },
+  { content: "Ensure furniture is in good condition", completed: false }
+])
+
+puts "Seeds created successfully!"

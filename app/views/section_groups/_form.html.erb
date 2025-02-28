@@ -1,0 +1,26 @@
+<!-- app/views/section_groups/_form.html.erb -->
+<%= turbo_frame_tag "section_#{section.id}_add_group_form" do %>
+  <div class="bg-gray-50 rounded-lg p-4 mb-4">
+    <h3 class="text-lg font-semibold mb-3">Add Group/Area to Section</h3>
+    
+    <% available_groups = organization.groups.where.not(id: section.groups.pluck(:id)) %>
+    
+    <% if available_groups.any? %>
+      <%= form_with url: organization_checklist_section_section_groups_path(organization, checklist, section), class: "flex" do |form| %>
+        <div class="flex-grow mr-2">
+          <%= form.select :group_id, 
+                          options_from_collection_for_select(available_groups, :id, :name), 
+                          { prompt: "Select a group/area" }, 
+                          class: "w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        </div>
+        
+        <%= form.submit "Add Group", class: "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" %>
+      <% end %>
+    <% else %>
+      <p class="text-gray-500">
+        All available groups have been added to this section or no groups have been created.
+        <%= link_to "Create new groups", organization_groups_path(organization), class: "text-blue-500 hover:text-blue-700" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

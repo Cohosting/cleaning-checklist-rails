@@ -73,3 +73,5 @@ gem 'httparty'
 gem "mission_control-jobs"
 
 gem 'letter_opener', group: :development
+# Gemfile
+gem 'acts_as_list'

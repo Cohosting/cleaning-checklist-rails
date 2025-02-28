@@ -1,63 +1,56 @@
-<div class="checklist-container">
-  <!-- Navigation -->
-  <%= link_to property_checklists_path(@property), class: "back-link" do %>
-    <i class="fas fa-arrow-left mr-2"></i>
-    Back to Checklists
-  <% end %>
-
-  <!-- Property and Checklist Context -->
-  <div class="context-header">
-    <div class="property-info">
-      <h1 class="property-name"><%= @property.name %></h1>
-      <p class="property-address">
-        <i class="fas fa-home mr-2"></i>
-        <%= @property.address %>
-      </p>
-    </div>
-    
-    <div class="checklist-info">
-      <h2 class="checklist-name"><%= @checklist.name %></h2>
-
-    </div>
-  </div>
-
-  <!-- Tasks Section -->
-  <div class="tasks-section">
-    <h3 class="tasks-title">Tasks</h3>
-
-    <!-- Add Task Form -->
-    <%= form_with(model: [@property, @checklist, Task.new], local: true, class: "new-task-form") do |f| %>
-      <div class="form-group">
-        <%= f.text_field :name, 
-            placeholder: "Add a task...",
-            class: "task-input",
-            required: true %>
-        <%= button_tag type: 'submit', class: "add-task-btn" do %>
-          <i class="fas fa-plus mr-2"></i>
-          Add Task
-        <% end %>
-      </div>
+<!-- app/views/checklists/show.html.erb -->
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <%= link_to organization_checklists_path(@organization), class: "text-blue-500 hover:text-blue-700 flex items-center" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Back to Checklists
     <% end %>
-
-    <!-- Tasks List -->
-    <div class="tasks-list">
-      <% if @checklist.tasks.any? %>
-        <% @checklist.tasks.each do |task| %>
-          <div class="task-item">
-            <span class="task-name"><%= task.name %></span>
-            <%= button_to property_checklist_task_path(@property, @checklist, task),
-                method: :delete,
-                class: "delete-task-btn",
-                form: { style: 'display: inline-block' } do %>
-              <i class="fas fa-trash"></i>
-            <% end %>
-          </div>
-        <% end %>
-      <% else %>
-        <p class="empty-state">
-          No tasks added yet. Add some tasks to your checklist.
-        </p>
+    
+    <div class="flex space-x-2">
+      <%= link_to edit_organization_checklist_path(@organization, @checklist), class: "px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+        Edit
+      <% end %>
+      <%= button_to organization_checklist_path(@organization, @checklist), method: :delete, class: "px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center", form: { data: { turbo_confirm: "Are you sure? This will delete all sections and tasks inside this checklist." } } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+        </svg>
+        Delete
       <% end %>
     </div>
   </div>
+  <div id="flash_messages" class="mb-4"></div>
+<div class="   overflow-hidden shadow-sm mb-8">
+  <div class="bg-gray-100 p-4">
+    <h1 class="text-lg font-semibold text-gray-800"><%= @checklist.title %></h1>
+    
+    <% if @checklist.description.present? %>
+      <p class="text-gray-600 mt-2"><%= @checklist.description %></p>
+    <% end %>
+  </div>
+  
+  <div class="py-4">
+    <div id="checklist_progress" class="mb-4">
+      <%= render "checklists/progress", checklist: @checklist %>
+    </div>
+    
+    <div id="new_section_form" class="mb-4">
+      <%= render "sections/form", organization: @organization, checklist: @checklist, section: @new_section %>
+    </div>
+    
+    <div id="checklist_sections" class="space-y-4" 
+         data-controller="drag" 
+         data-drag-url-value="<%= move_organization_checklist_sections_path(@organization, @checklist) %>">
+      <% if @sections.any? %>
+        <%= render partial: "sections/section", collection: @sections, locals: { organization: @organization, checklist: @checklist } %>
+      <% else %>
+        <p class="text-gray-500 text-center py-2 bg-white rounded-lg">No sections yet. Add your first section above!</p>
+      <% end %>
+    </div>
+  </div>
+</div>
 </div>

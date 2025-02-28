@@ -1,4 +1,17 @@
 Rails.application.routes.draw do
+  get "section_groups/create"
+  get "section_groups/destroy"
+  get "section_groups/move"
+  get "groups/index"
+  get "groups/new"
+  get "groups/create"
+  get "groups/edit"
+  get "groups/update"
+  get "groups/destroy"
+  get "sections/create"
+  get "sections/update"
+  get "sections/destroy"
+  get "sections/move"
   get "organizations/show"
   root "dashboard#index" # Set dashboard as home
   # Sign-up routes (UsersController)
@@ -45,7 +58,37 @@ Rails.application.routes.draw do
   resources :organizations do
     resources :invitations, only: :create
   end
-
+  resources :organizations do
+    resources :groups
+    
+    resources :checklists do
+      resources :sections, only: [:create, :edit, :update, :destroy] do
+        collection do
+          patch :move
+        end
+        
+        resources :section_groups, only: [:create, :edit, :destroy] do
+          collection do
+            patch :move
+          end
+          
+          member do
+            patch :move_to_section 
+            get :new_task_form
+            get :empty_state  # Add this line for the empty state route
+          end
+          
+          resources :tasks, only: [:create, :update, :edit, :destroy] do
+            member do
+              patch :toggle
+              patch :move
+            end
+          end
+        end
+      end
+    end
+  
+  end
   # Public job sharing
   resources :job_shares, only: [:show], param: :public_token
 

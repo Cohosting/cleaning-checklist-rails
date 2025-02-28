@@ -4,6 +4,6 @@ class Organization < ApplicationRecord
   has_many :users, through: :memberships
   has_many :invitations, dependent: :destroy
 
- 
+  has_many :groups, dependent: :destroy
+  has_many :checklists, dependent: :destroy
 end
- 

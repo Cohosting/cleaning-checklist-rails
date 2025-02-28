@@ -1,0 +1,12 @@
+<!-- app/views/tasks/_form.html.erb -->
+<%= turbo_frame_tag dom_id(task, :form) do %>
+  <div class="py-1.5 px-1">
+    <%= form_with model: [organization, checklist, section, section_group, task], class: "flex" do |form| %>
+      <div class="flex-grow mr-2">
+        <%= form.text_field :content, placeholder: "Add a to-do", class: "w-full px-3 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-gray-400" %>
+      </div>
+      
+      <%= form.submit task.new_record? ? "Add" : "Update", class: "px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 rounded-full text-sm hover:bg-gray-200" %>
+    <% end %>
+  </div>
+<% end %>

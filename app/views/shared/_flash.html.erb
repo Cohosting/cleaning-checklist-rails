@@ -1,0 +1,6 @@
+<!-- app/views/shared/_flash.html.erb -->
+<div class="flash-message mb-4 p-4 rounded <%= type == 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>"
+     data-controller="flash"
+     data-action="animationend->flash#remove">
+  <%= message %>
+</div>

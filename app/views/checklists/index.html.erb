@@ -1,61 +1,18 @@
-<div class="container">
-  <div class="checklists-container">
-    <!-- Navigation -->
-    <%= link_to root_path, class: "back-link" do %>
-      <i class="fas fa-arrow-left mr-2"></i>
-      Back to Properties
+<!-- app/views/checklists/index.html.erb -->
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">My Checklists</h1>
+  
+  <div id="flash_messages" class="mb-4"></div>
+  
+  <!-- Form to create a new checklist -->
+  <div id="new_checklist" class="mb-8">
+    <%= render "form", checklist: Checklist.new %>
+  </div>
+  
+  <!-- Grid to display existing checklists -->
+  <div id="checklists" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @checklists.reject(&:new_record?).each do |checklist| %>
+      <%= render partial: "checklist", locals: { checklist: checklist, organization: @organization } %>
     <% end %>
-
-    <!-- Property Header -->
-    <div class="property-header">
-      <h1 class="property-name"><%= @property.name %></h1>
-      <p class="property-address">
-        <i class="fas fa-home mr-2"></i>
-        <%= @property.address %>
-      </p>
-    </div>
-
-    <!-- Checklists Section -->
-    <div class="checklists-header">
-      <h2 class="checklists-title">Cleaning Checklists</h2>
-      <%= link_to new_property_checklist_path(@property), class: "new-checklist-btn" do %>
-        <i class="fas fa-plus mr-2"></i>
-        New Checklist
-      <% end %>
-    </div>
-
-    <!-- Checklists List -->
-    <div class="checklists-list">
-      <% @checklists.each do |checklist| %>
-        <div class="checklist-card">
-          <%= link_to property_checklist_path(@property, checklist), class: "checklist-content" do %>
-            <div class="checklist-info-list">
-              <div class="checklist-header">
-                <i class="fas fa-check-square text-blue-600 mr-2"></i>
-                <h3 class="checklist-name"><%= checklist.name %></h3>
-                <% if @property.default_checklist_id == checklist.id %>
-                  <span class="default-badge">Default</span>
-                <% end %>
-              </div>
-
-              <div class="checklist-meta">
-                <span class="mr-4"><%= checklist.tasks.count %> tasks</span>
-                &nbsp;
-                <span>Last updated: <%= checklist.updated_at.strftime("%Y-%m-%d") %></span>
-              </div>
-            </div>
-            <i class="fas fa-chevron-right text-gray-400"></i>
-          <% end %>
-
-          <!-- Make Default Button (Hidden if Already Default) -->
-<% unless @property.default_checklist_id == checklist.id %>
-  <%= button_to "Make Default", make_default_checklist_property_path(@property, checklist_id: checklist.id),
-    method: :patch,
-    class: "make-default-btn" %>
-<% end %>
-
-        </div>
-      <% end %>
-    </div>
   </div>
 </div>
