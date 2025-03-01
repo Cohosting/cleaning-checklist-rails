@@ -1,0 +1,19 @@
+<%# app/views/tasks/toggle.turbo_stream.erb %>
+
+<%= turbo_stream.replace(@task, 
+                        partial: "tasks/task", 
+                        locals: { 
+                          task: @task, 
+                          organization: @organization,
+                          checklist: @checklist, 
+                          section: @section,
+                          section_group: @section_group 
+                        }) %>
+
+<%= turbo_stream.update("checklist_progress", 
+                       partial: "checklists/progress", 
+                       locals: { checklist: @checklist }) %>
+
+<%= turbo_stream.update("section_#{@section.id}_progress", 
+                       partial: "sections/progress", 
+                       locals: { section: @section }) %>

@@ -1,0 +1,19 @@
+<%# app/views/tasks/move.turbo_stream.erb %>
+
+<% if @original_is_empty %>
+  <%= turbo_stream.append(dom_id(@original_section_group, :tasks), 
+                         partial: "tasks/empty_state", 
+                         locals: { section_group: @original_section_group }) %>
+<% end %>
+
+<% if @target_was_empty %>
+  <%= turbo_stream.remove(dom_id(@target_section_group, :empty_state)) %>
+<% end %>
+
+<%= turbo_stream.update("checklist_progress", 
+                       partial: "checklists/progress", 
+                       locals: { checklist: @checklist }) %>
+
+<%= turbo_stream.update("section_#{@section.id}_progress", 
+                       partial: "sections/progress", 
+                       locals: { section: @section }) %>

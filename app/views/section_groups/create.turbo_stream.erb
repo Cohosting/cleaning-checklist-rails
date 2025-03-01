@@ -1,0 +1,22 @@
+# section_groups/create.turbo_stream.erb
+
+<%= turbo_stream.replace dom_id(@section, :add_group_form) do %>
+  <%= render "section_groups/add_form", organization: @organization, section: @section %>
+<% end %>
+
+<%= turbo_stream.append dom_id(@section, :groups) do %>
+  <%= render "section_groups/section_group", 
+       section_group: @section_group, 
+       organization: @organization,
+       checklist: @checklist,
+       section: @section %>
+<% end %>
+
+<%= turbo_stream.prepend "flash_messages" do %>
+  <%= render "shared/flash", message: "Group added to section!", type: "success" %>
+<% end %>
+
+<%= turbo_stream.update dom_id(@section, :groups) do %>
+  <%= render partial: "section_groups/section_group", collection: @section.section_groups, 
+             locals: { organization: @organization, checklist: @checklist, section: @section } %>
+<% end %>

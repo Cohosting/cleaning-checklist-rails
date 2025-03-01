@@ -1,0 +1,15 @@
+<%# app/views/tasks/destroy.turbo_stream.erb %>
+
+<%= turbo_stream.remove(@task) %>
+
+<%= turbo_stream.update("checklist_progress", 
+                       partial: "checklists/progress", 
+                       locals: { checklist: @checklist }) %>
+
+<%= turbo_stream.update("section_#{@section.id}_progress", 
+                       partial: "sections/progress", 
+                       locals: { section: @section }) %>
+
+<%= turbo_stream.prepend("flash_messages", 
+                        partial: "shared/flash", 
+                        locals: { message: "Task deleted!", type: "success" }) %>

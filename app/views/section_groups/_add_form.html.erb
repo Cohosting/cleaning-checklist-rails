@@ -1,4 +1,6 @@
 <!-- app/views/section_groups/_add_form.html.erb -->
+<div id="<%= dom_id(section, :add_group_form) %>" class="bg-white rounded-lg shadow p-4">
+
 <div class="bg-white rounded-lg shadow p-4">
   <h3 class="text-lg font-semibold mb-3">Add a new group...</h3>
   
@@ -7,7 +9,7 @@
   </div>
   
   <div class="flex justify-between items-center">
-    <% available_groups = organization.groups.where.not(id: section.groups.pluck(:id)) %>
+    <% available_groups = organization.groups %>
     <% if available_groups.any? %>
       <div>
         <button type="button" data-action="click->section#toggleExistingGroups" class="text-blue-500 hover:text-blue-700">
@@ -24,8 +26,8 @@
       </div>
     <% else %>
       <div class="text-gray-500 text-sm">
-        No more groups available.
-        <%= link_to "Create new ones", organization_groups_path(organization), class: "text-blue-500 hover:underline" %>
+        Groups not available. Create One!
+
       </div>
     <% end %>
     
@@ -38,4 +40,6 @@
       </button>
     </div>
   </div>
+</div>
+
 </div>

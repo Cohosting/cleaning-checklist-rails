@@ -1,0 +1,57 @@
+<%# app/views/tasks/create.turbo_stream.erb %>
+
+<% if @task.persisted? %>
+  <%# Success case - task was saved successfully %>
+  
+  <%# Update the form with a fresh task %>
+  <%= turbo_stream.update("new_task_form_section_group_#{@section_group.id}", 
+                         partial: "tasks/form", 
+                         locals: { 
+                           organization: @organization,
+                           checklist: @checklist, 
+                           section: @section,
+                           section_group: @section_group, 
+                           task: Task.new 
+                         }) %>
+
+  <%# Append the new task to the list %>
+  <%= turbo_stream.append(dom_id(@section_group, :tasks), 
+                        partial: "tasks/task", 
+                        locals: { 
+                          task: @task, 
+                          organization: @organization,
+                          checklist: @checklist, 
+                          section: @section,
+                          section_group: @section_group 
+                        }) %>
+
+  <%# Remove the empty state if it exists %>
+  <%= turbo_stream.remove(dom_id(@section_group, :empty_state)) %>
+
+  <%# Update progress indicators %>
+  <%= turbo_stream.update("checklist_progress", 
+                        partial: "checklists/progress", 
+                        locals: { checklist: @checklist }) %>
+
+  <%= turbo_stream.update("section_#{@section.id}_progress", 
+                        partial: "sections/progress", 
+                        locals: { section: @section }) %>
+
+  <%# Add success flash message %>
+  <%= turbo_stream.prepend("flash_messages", 
+                         partial: "shared/flash", 
+                         locals: { message: "Task added!", type: "success" }) %>
+<% else %>
+  <%# Failure case - validation errors %>
+  
+  <%# Update the form to show validation errors %>
+  <%= turbo_stream.update("new_task_form_section_group_#{@section_group.id}", 
+                         partial: "tasks/form", 
+                         locals: { 
+                           organization: @organization,
+                           checklist: @checklist, 
+                           section: @section,
+                           section_group: @section_group, 
+                           task: @task 
+                         }) %>
+<% end %>

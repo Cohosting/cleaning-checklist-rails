@@ -1,25 +1,13 @@
-# fly.toml app configuration file generated for cleaning-checklist-summer-flower-6522 on 2025-02-25T10:42:08+06:00
+# fly.toml app configuration file generated for cleaning-checklist-rails on 2025-02-28T21:04:52+06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'cleaning-checklist-summer-flower-6522'
-primary_region = 'sin'
+app = 'cleaning-checklist-rails'
+primary_region = 'iad'
 console_command = '/rails/bin/rails console'
 
 [build]
-
-[env]
-  DATABASE_URL = 'sqlite3:///data/production.sqlite3'
-  PORT = '8080'
-  SOLID_QUEUE_IN_PUMA = 'true'
-
-[[mounts]]
-  source = 'data'
-  destination = '/data'
-  auto_extend_size_threshold = 80
-  auto_extend_size_increment = '1GB'
-  auto_extend_size_limit = '10GB'
 
 [http_service]
   internal_port = 8080

@@ -15,35 +15,18 @@ class SectionGroupsController < ApplicationController
   
     respond_to do |format|
       if @section_group.save
-        format.turbo_stream { 
-          render turbo_stream: [
-            # Use the same dom_id helper to generate matching ID
-            turbo_stream.append(dom_id(@section, :groups), 
-                               partial: "section_groups/section_group", 
-                               locals: { 
-                                 section_group: @section_group, 
-                                 organization: @organization,
-                                 checklist: @checklist,
-                                 section: @section
-                               }),
-            turbo_stream.prepend("flash_messages", 
-                               partial: "shared/flash", 
-                               locals: { message: "Group added to section!", type: "success" })
-          ]
-        }
+        format.turbo_stream # Rails will automatically look for `create.turbo_stream.erb`
         format.html { redirect_to organization_checklist_path(@organization, @checklist), notice: "Group added to section!" }
         format.json { render json: { success: true } }
       else
-        format.turbo_stream { 
-          render turbo_stream: turbo_stream.prepend("flash_messages", 
-                                                   partial: "shared/flash", 
-                                                   locals: { message: "Could not add group to section!", type: "error" })
-        }
+        format.turbo_stream { render "error" } # Look for `error.turbo_stream.erb`
         format.html { redirect_to organization_checklist_path(@organization, @checklist), alert: "Could not add group to section!" }
         format.json { render json: { success: false, errors: @section_group.errors.full_messages } }
       end
     end
   end
+  
+  
   def destroy
     @section_group.destroy
     
@@ -72,36 +55,30 @@ class SectionGroupsController < ApplicationController
     
     head :ok
   end
- def move_to_section
-  begin
-    @section_group = @section.section_groups.find(params[:id])
-    @target_section = @checklist.sections.find(params[:target_section_id])
-    
-    # Debug info
-    Rails.logger.info("Moving section_group #{@section_group.id} to section #{@target_section.id}")
-    
-    # Check if the group already exists in the target section
-    existing_group = @target_section.section_groups.find_by(group_id: @section_group.group_id)
-    
-    if existing_group
-      # If the group already exists in target section, move tasks instead of the group
-      @section_group.tasks.update_all(section_group_id: existing_group.id)
-      @section_group.destroy
+  def move_to_section
+    begin
+      @section_group = @section.section_groups.find(params[:id])
+      @target_section = @checklist.sections.find(params[:target_section_id])
       
-      render json: { success: true, message: "Tasks moved to existing group in target section" }
-    else
-      # Update the section_group to belong to the new section
-      if @section_group.update(section: @target_section, position: params[:position])
-        render json: { success: true, message: "Group moved to different section" }
+      existing_group = @target_section.section_groups.find_by(group_id: @section_group.group_id)
+      
+      if existing_group
+        @section_group.tasks.update_all(section_group_id: existing_group.id)
+        @section_group.destroy
       else
-        render json: { success: false, errors: @section_group.errors.full_messages }, status: :unprocessable_entity
+        @section_group.update(section: @target_section, position: params[:position])
       end
+  
+      respond_to do |format|
+        format.turbo_stream
+        format.json { render json: { success: true, message: "Group moved successfully" } }
+      end
+    rescue => e
+      Rails.logger.error("Error in move_to_section: #{e.message}")
+      render json: { success: false, error: e.message }, status: :internal_server_error
     end
-  rescue => e
-    Rails.logger.error("Error in move_to_section: #{e.message}")
-    render json: { success: false, error: e.message }, status: :internal_server_error
   end
-end
+  
 def new_task_form
   @organization = Organization.find(params[:organization_id])
   @checklist = @organization.checklists.find(params[:checklist_id])

@@ -1,6 +1,5 @@
 <!-- app/views/checklists/_checklist.html.erb -->
 <% if checklist.persisted? %>
-  <%= turbo_frame_tag dom_id(checklist) do %>
     <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
       <div class="p-6">
         <div class="flex justify-between items-start mb-4">
@@ -35,7 +34,6 @@
         </div>
       </div>
     </div>
-  <% end %>
 <% else %>
   <p class="text-gray-500">This checklist is not saved yet.</p>
 <% end %>

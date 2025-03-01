@@ -1,0 +1,43 @@
+<%# app/views/tasks/update.turbo_stream.erb %>
+
+<% if @task.errors.empty? %>
+  <%# Success case - task was updated successfully %>
+  
+  <%# Replace the task in the list %>
+  <%= turbo_stream.replace(@task, 
+                          partial: "tasks/task", 
+                          locals: { 
+                            task: @task, 
+                            organization: @organization,
+                            checklist: @checklist, 
+                            section: @section,
+                            section_group: @section_group 
+                          }) %>
+
+  <%# Update progress indicators %>
+  <%= turbo_stream.update("checklist_progress", 
+                         partial: "checklists/progress", 
+                         locals: { checklist: @checklist }) %>
+
+  <%= turbo_stream.update("section_#{@section.id}_progress", 
+                         partial: "sections/progress", 
+                         locals: { section: @section }) %>
+
+  <%# Add success flash message %>
+  <%= turbo_stream.prepend("flash_messages", 
+                          partial: "shared/flash", 
+                          locals: { message: "Task updated!", type: "success" }) %>
+<% else %>
+  <%# Failure case - validation errors %>
+  
+  <%# Update the form to show validation errors %>
+  <%= turbo_stream.update("task_#{@task.id}_form", 
+                         partial: "tasks/form", 
+                         locals: { 
+                           organization: @organization,
+                           checklist: @checklist, 
+                           section: @section,
+                           section_group: @section_group, 
+                           task: @task 
+                         }) %>
+<% end %>
