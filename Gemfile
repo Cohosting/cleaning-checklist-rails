@@ -75,3 +75,8 @@ gem "mission_control-jobs"
 gem 'letter_opener', group: :development
 # Gemfile
 gem 'acts_as_list'
+
+
+group :production do
+  gem "pg", "~> 1.2"
+end

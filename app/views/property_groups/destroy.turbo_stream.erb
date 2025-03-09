@@ -1,0 +1,20 @@
+<%# app/views/property_groups/destroy.turbo_stream.erb %>
+<%= turbo_stream.remove(@property_group) %>
+
+<% if @property.property_groups.reload.empty? %>
+  <%# Hide the container if it's now empty %>
+  <%= turbo_stream.replace "property-groups-container" do %>
+    <div id="property-groups-container" class="bg-white shadow overflow-hidden sm:rounded-md hidden">
+      <ul id="property-groups-list" class="divide-y divide-gray-200"></ul>
+    </div>
+  <% end %>
+  
+  <%# Show the "no areas" message %>
+  <%= turbo_stream.update "no-property-groups-message" do %>
+    <%= render "property_groups/no_areas_message" %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "flash" do %>
+  <%= render partial: "shared/flash", locals: { message: "Area was successfully removed" } %>
+<% end %>

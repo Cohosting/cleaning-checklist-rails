@@ -1,27 +1,50 @@
+<%# app/views/upsells/index.html.erb %>
 <% content_for :title, "Upsells" %>
 
 <div class="w-full">
   <% if notice.present? %>
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
-
-  <div class="flex justify-between items-center">
+  
+  <div class="flex justify-between items-center mb-6">
     <h1 class="font-bold text-4xl">Upsells</h1>
-<%= link_to "New Upsell", new_property_upsell_path(@property), class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
-
+    <%= link_to "New Upsell", new_organization_upsell_path(@organization), class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
-
-  <div id="upsells" class="min-w-full">
-    <% if @upsells.any? %>
+  
+  <% if @upsells.any? %>
+    <div class="text-sm text-gray-500 mb-2 italic">
+      <i class="fa fa-arrows-alt"></i> Drag to reorder
+    </div>
+    
+    <div id="upsells" class="sortable-list" data-controller="sortable" data-sortable-resource-url-value="<%= reorder_organization_upsells_path(@organization) %>">
       <% @upsells.each do |upsell| %>
-        <%= render upsell %>
-        <p>
-<%= link_to "Show this upsell", property_upsell_path(@property, upsell), class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-
-        </p>
+        <div id="<%= dom_id(upsell) %>" class="sortable-item bg-white shadow rounded-md p-4 mb-4 cursor-move" data-sortable-target="item" data-id="<%= upsell.id %>">
+          <div class="flex items-center">
+            <div class="drag-handle mr-3 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+            </div>
+            
+            <div class="flex-grow grid grid-cols-3 gap-2">
+              <div>
+                <span class="font-medium"><%= upsell.title %></span>
+              </div>
+              <div>
+                <span class="text-gray-700"><%= number_to_currency(upsell.price) %></span>
+              </div>
+              <div>
+                <span class="<%= upsell.status == 'active' ? 'text-green-600' : 'text-gray-500' %>"><%= upsell.status %></span>
+              </div>
+            </div>
+            
+            <div class="flex space-x-2">
+              <%= link_to "View", organization_upsell_path(@organization, upsell), class: "rounded-md px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-sm font-medium" %>
+              <%= link_to "Edit", edit_properties_organization_upsell_path(@organization, upsell), class: "rounded-md px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-sm font-medium" %>
+            </div>
+          </div>
+        </div>
       <% end %>
-    <% else %>
-      <p class="text-center my-10">No upsells found.</p>
-    <% end %>
-  </div>
+    </div>
+  <% else %>
+    <p class="text-center my-10 text-gray-500">No upsells found.</p>
+  <% end %>
 </div>

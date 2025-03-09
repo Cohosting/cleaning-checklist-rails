@@ -1,0 +1,2 @@
+<!-- app/views/upsells/edit_properties.js.erb -->
+document.getElementById('properties-list').innerHTML = '<%= j render partial: "property_list", locals: { properties: @properties, selected_property_ids: @selected_property_ids } %>';

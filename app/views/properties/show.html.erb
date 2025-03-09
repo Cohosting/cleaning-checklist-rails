@@ -1,26 +1,39 @@
-<div class="container">
-  <h2>Property: <%= @property.name %></h2>
-  <p>Address: <%= @property.address %></p>
+<%# app/views/properties/show.html.erb %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <%= render partial: "shared/flash", locals: { message: notice } %>
 
-  <h3>Checklists</h3>
-  <ul>
-    <% @property.checklists.each do |checklist| %>
-      <li>
-        <strong><%= checklist.name %></strong>
-        <%= link_to "View", property_checklist_path(@property, checklist), class: "btn" %>
-      </li>
+  <h1 class="text-3xl font-bold text-gray-900 mb-6"><%= @property.name %></h1>
+
+  <%# Other property details %>
+
+  <div class="mt-10">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Areas</h2>
+
+    <div id="property-groups" class="mb-4">
+      <div id="property-groups-container" class="bg-white shadow overflow-hidden sm:rounded-md <%= 'hidden' if @property.property_groups.empty? %>">
+        <ul id="property-groups-list" class="divide-y divide-gray-200">
+          <% @property.property_groups.each do |property_group| %>
+            <%= render partial: "property_groups/property_group", locals: { property_group: property_group, property: @property } %>
+          <% end %>
+        </ul>
+      </div>
+      
+      <div id="no-property-groups-message">
+        <% if @property.property_groups.empty? %>
+          <%= render "property_groups/no_areas_message" %>
+        <% end %>
+      </div>
+    </div>
+
+    <%= turbo_frame_tag "add_area_form" do %>
+      <%= link_to new_organization_property_property_group_path(@property.organization, @property), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+                data: { turbo_frame: "add_area_form" } do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Add Area
+      <% end %>
     <% end %>
-  </ul>
-
-  <h3>Jobs</h3>
-  <ul>
-    <% @property.jobs.each do |job| %>
-      <li>
-        <strong>Cleaning on <%= job.date %></strong>
-        <%= link_to "View Job", property_job_path(@property, job), class: "btn" %>
-      </li>
-    <% end %>
-  </ul>
-
-  <%= link_to "New Job", new_property_job_path(@property), class: "btn btn-primary" %>
+  </div>
 </div>

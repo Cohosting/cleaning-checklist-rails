@@ -1,18 +1,10 @@
-<%= form_with model: [@property, @job] do |f| %>
+<%= form_with model: [@organization, @property, @job] do |f| %>
   <div>
     <%= f.label :date, "Cleaning Date" %>
     <%= f.date_field :date %>
   </div>
 
-  <div>
-    <%= f.label :checklist_id, "Select Checklist" %>
-    <% if @property.checklists.any? %>
-      <%= f.collection_select :checklist_id, @property.checklists, :id, :name, 
-            { prompt: "Select a checklist", selected: @property.default_checklist&.id } %>
-    <% else %>
-      <p class="text-gray-500">No checklists available for this property.</p>
-    <% end %>
-  </div>
+ 
 
   <div>
     <%= f.submit "Create Job", class: "btn btn-primary" %>

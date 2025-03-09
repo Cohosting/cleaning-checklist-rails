@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,6 +56,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
     t.integer "organization_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "default", default: false
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
@@ -92,7 +93,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
 
   create_table "jobs", force: :cascade do |t|
     t.integer "property_id", null: false
-    t.integer "checklist_id", null: false
+    t.integer "checklist_id"
     t.date "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -127,8 +128,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
     t.datetime "updated_at", null: false
     t.bigint "default_checklist_id"
     t.string "hospitable_id"
+    t.integer "organization_id", null: false
     t.index ["default_checklist_id"], name: "index_properties_on_default_checklist_id"
     t.index ["hospitable_id"], name: "index_properties_on_hospitable_id", unique: true
+    t.index ["organization_id"], name: "index_properties_on_organization_id"
+  end
+
+  create_table "property_groups", force: :cascade do |t|
+    t.integer "property_id", null: false
+    t.integer "group_id", null: false
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_property_groups_on_group_id"
+    t.index ["property_id"], name: "index_property_groups_on_property_id"
   end
 
   create_table "reservations", force: :cascade do |t|
@@ -192,6 +205,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
     t.index ["section_group_id"], name: "index_tasks_on_section_group_id"
   end
 
+  create_table "upsell_properties", force: :cascade do |t|
+    t.integer "upsell_id", null: false
+    t.integer "property_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_upsell_properties_on_property_id"
+    t.index ["upsell_id", "property_id"], name: "index_upsell_properties_on_upsell_id_and_property_id", unique: true
+    t.index ["upsell_id"], name: "index_upsell_properties_on_upsell_id"
+  end
+
   create_table "upsells", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -200,8 +223,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
     t.datetime "updated_at", null: false
     t.string "status"
     t.string "stripe_checkout_session_id"
-    t.integer "property_id", null: false
-    t.index ["property_id"], name: "index_upsells_on_property_id"
+    t.integer "organization_id", null: false
+    t.integer "position"
+    t.index ["organization_id"], name: "index_upsells_on_organization_id"
+    t.index ["position"], name: "index_upsells_on_position"
   end
 
   create_table "users", force: :cascade do |t|
@@ -226,6 +251,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
   add_foreign_key "memberships", "users"
   add_foreign_key "organizations", "users", column: "owner_id"
   add_foreign_key "properties", "checklists", column: "default_checklist_id"
+  add_foreign_key "properties", "organizations"
+  add_foreign_key "property_groups", "groups"
+  add_foreign_key "property_groups", "properties"
   add_foreign_key "reservations", "guests"
   add_foreign_key "reservations", "properties"
   add_foreign_key "section_groups", "groups"
@@ -233,6 +261,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_26_093212) do
   add_foreign_key "sections", "checklists"
   add_foreign_key "sessions", "users"
   add_foreign_key "tasks", "section_groups"
-  add_foreign_key "upsells", "properties"
+  add_foreign_key "upsell_properties", "properties"
+  add_foreign_key "upsell_properties", "upsells"
+  add_foreign_key "upsells", "organizations"
   add_foreign_key "users", "organizations"
 end

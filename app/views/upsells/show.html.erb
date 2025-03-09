@@ -9,15 +9,15 @@
 
   <%= render @upsell %>
 
-  <%= link_to "Edit this upsell", edit_property_upsell_path(@property,@upsell), class: "mt-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to upsells", property_upsells_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+  <%= link_to "Edit this upsell", edit_organization_upsell_path(@organization,@upsell), class: "mt-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+  <%= link_to "Back to upsells", organization_upsells_path, class: "ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
   <div class="inline-block ml-2">
     <%= button_to "Destroy this upsell", 
-                  property_upsell_path(@property,@upsell)      , method: :delete, class: "mt-2 rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium" %>
+                  organization_upsell_path(@organization,@upsell)      , method: :delete, class: "mt-2 rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium" %>
   </div>
 
 
-  <%= button_to "Buy Now", checkout_property_upsell_path(@property, @upsell), data: { turbo: false }, class: "button" %>
+  <%= button_to "Buy Now", checkout_organization_upsell_path(@organization, @upsell), data: { turbo: false }, class: "button" %>
 
 
 </div>

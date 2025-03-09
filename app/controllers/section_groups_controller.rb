@@ -38,7 +38,7 @@ class SectionGroupsController < ApplicationController
             organization: @organization,
             checklist: @checklist,
             section: @section,
-            available_groups: @organization.groups.where.not(id: @section.groups.pluck(:id))
+            available_groups: @organization.groups.where.not(id: @section.section_groups.pluck(:id))
           }),
           turbo_stream.prepend("flash_messages", partial: "shared/flash", locals: { message: "Group removed from section!", type: "success" })
         ]

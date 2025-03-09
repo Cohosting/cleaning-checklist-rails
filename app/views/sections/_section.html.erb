@@ -65,12 +65,10 @@
                      locals: { organization: organization, checklist: checklist, section: section } %>
         <% else %>
           <div class="flex mb-3">
-<p id="<%= dom_id(section, :no_groups) %>" class="text-gray-500 text-sm py-2 px-3 rounded-full border border-gray-200">
-        No groups yet. Add your first group above!
-      </p>
-    </div>
+            <p id="<%= dom_id(section, :no_groups) %>" class="text-gray-500 text-sm py-2 px-3 rounded-full border border-gray-200">
+              No groups yet. Add your first group above!
+            </p>
           </div>
-         
         <% end %>
       </div>
     </div>

@@ -9,8 +9,16 @@
   </div>
   
   <div class="flex justify-between items-center">
-    <% available_groups = organization.groups %>
-    <% if available_groups.any? %>
+<% 
+  # Get all organization groups
+  all_organization_groups = organization.groups
+
+  # Get already selected groups for this section
+  selected_group_ids = @checklist.section_groups.pluck(:group_id)
+  
+  # Filter out groups that are already selected
+  available_groups = all_organization_groups.where.not(id: selected_group_ids)
+%>    <% if available_groups.any? %>
       <div>
         <button type="button" data-action="click->section#toggleExistingGroups" class="text-blue-500 hover:text-blue-700">
           Or select existing group

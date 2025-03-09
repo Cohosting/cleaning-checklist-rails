@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :organizations, through: :memberships
-  belongs_to :organization, optional: true # Directly uses organization_id
+  belongs_to :organization, optional: true  
   has_many :sessions, dependent: :destroy
 
   

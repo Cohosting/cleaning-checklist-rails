@@ -1,5 +1,5 @@
 class JobsController < ApplicationController
-  before_action :set_property, only: [:new, :create, :index]
+  before_action :set_organization_and_property, only: [:new, :create, :index]
   before_action :set_job, only: [:show]
 
   def index
@@ -16,16 +16,18 @@ class JobsController < ApplicationController
   def create
     @job = @property.jobs.build(job_params)
     if @job.save
-      redirect_to property_jobs_path(@property), notice: "Job created successfully."
+      redirect_to organization_property_jobs_path(@organization, @property), notice: "Job created successfully."
     else
+      puts @job.errors.full_messages
       render :new, status: :unprocessable_entity
     end
   end
 
   private
 
-  def set_property
-    @property = Property.find(params[:property_id])
+  def set_organization_and_property
+    @organization = Organization.find(params[:organization_id])
+    @property = @organization.properties.find(params[:property_id])
   end
 
   def set_job

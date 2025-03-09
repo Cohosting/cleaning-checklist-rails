@@ -1,6 +1,6 @@
 class Job < ApplicationRecord
   belongs_to :property
-  belongs_to :checklist
+  belongs_to :checklist, optional: true
   has_many :job_tasks, dependent: :destroy
 
   after_create :copy_tasks_from_checklist
@@ -27,6 +27,7 @@ class Job < ApplicationRecord
   end
 
   def copy_tasks_from_checklist
+    return unless checklist
     checklist.tasks.each do |task|
       job_tasks.create!(name: task.name, completed: false)
     end

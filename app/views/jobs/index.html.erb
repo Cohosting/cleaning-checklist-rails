@@ -18,7 +18,7 @@
   <!-- Actions -->
   <div class="jobs-header">
     <h2 class="jobs-title">Cleaning Jobs</h2>
-    <%= link_to new_property_job_path(@property), class: "new-job-btn" do %>
+    <%= link_to new_organization_property_job_path( @organization, @property), class: "new-job-btn" do %>
       <i class="fas fa-plus mr-2"></i>
       Schedule New Job
     <% end %>
@@ -27,7 +27,7 @@
   <!-- Jobs List -->
   <div class="jobs-list">
     <% @jobs.each do |job| %>
-      <%= link_to property_job_path(@property, job), class: "job-card" do %>
+      <%= link_to organization_property_job_path( @organization, @property, job), class: "job-card" do %>
         <div class="job-content">
           <div class="job-info">
             <i class="fas fa-calendar text-gray-600"></i>

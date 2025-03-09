@@ -1,0 +1,33 @@
+<!-- app/views/upsells/_property_list.html.erb -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <% properties.each do |property| %>
+    <div class="relative border border-gray-200 rounded-md overflow-hidden group 
+                <%= selected_property_ids.include?(property.id) ? 'ring-2 ring-blue-500 bg-blue-50' : '' %>">
+      <div class="absolute top-2 left-2 z-10">
+        <%= check_box_tag "property_ids[]", property.id, 
+                         selected_property_ids.include?(property.id),
+                         id: "property_#{property.id}",
+                         class: "h-4 w-4 text-blue-600 rounded focus:ring-blue-500",
+                         data: { property_selection_target: "checkbox" } %>
+      </div>
+      
+      <label for="property_<%= property.id %>" class="block cursor-pointer">
+        <div class="aspect-w-16 aspect-h-9 bg-gray-200">
+          <% if property.respond_to?(:image_url) && property.image_url.present? %>
+            <%= image_tag property.image_url, class: "object-cover w-full h-full" %>
+          <% else %>
+            <div class="w-full h-full flex items-center justify-center bg-gray-200">
+              <span class="text-gray-500">No image</span>
+            </div>
+          <% end %>
+        </div>
+        <div class="p-3">
+           <% if property.respond_to?(:name) && property.name.present? %>
+            <div class="text-sm text-gray-500 mt-1 truncate"><%= property.name %></div>
+          <% end %>
+        </div>
+      </label>
+    </div>
+  <% end %>
+</div>
+

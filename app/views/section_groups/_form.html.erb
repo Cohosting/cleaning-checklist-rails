@@ -3,7 +3,7 @@
   <div class="bg-gray-50 rounded-lg p-4 mb-4">
     <h3 class="text-lg font-semibold mb-3">Add Group/Area to Section</h3>
     
-    <% available_groups = organization.groups.where.not(id: section.groups.pluck(:id)) %>
+    <% available_groups = organization.groups.where.not(id: section.section_groups.pluck(:id)) %>
     
     <% if available_groups.any? %>
       <%= form_with url: organization_checklist_section_section_groups_path(organization, checklist, section), class: "flex" do |form| %>

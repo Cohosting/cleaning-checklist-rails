@@ -1,32 +1,34 @@
 class PropertiesController < ApplicationController
+  before_action :set_organization
   before_action :set_property, only: %i[ show edit update destroy make_default_checklist ]
 
-  # GET /properties or /properties.json
+  # GET /organizations/:organization_id/properties
   def index
-    @properties = Property.all
+    @properties = @organization.properties
   end
 
-  # GET /properties/1 or /properties/1.json
+  # GET /organizations/:organization_id/properties/:id
   def show
+    
   end
 
-  # GET /properties/new
+  # GET /organizations/:organization_id/properties/new
   def new
-    @property = Property.new
+    @property = @organization.properties.new
   end
 
-  # GET /properties/1/edit
+  # GET /organizations/:organization_id/properties/:id/edit
   def edit
   end
 
-  # POST /properties or /properties.json
+  # POST /organizations/:organization_id/properties
   def create
-    @property = Property.new(property_params)
+    @property = @organization.properties.new(property_params)
 
     respond_to do |format|
       if @property.save
-        format.html { redirect_to @property, notice: "Property was successfully created." }
-        format.json { render :show, status: :created, location: @property }
+        format.html { redirect_to organization_property_path(@organization, @property), notice: "Property was successfully created." }
+        format.json { render :show, status: :created, location: organization_property_path(@organization, @property) }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @property.errors, status: :unprocessable_entity }
@@ -34,12 +36,12 @@ class PropertiesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /properties/1 or /properties/1.json
+  # PATCH/PUT /organizations/:organization_id/properties/:id
   def update
     respond_to do |format|
       if @property.update(property_params)
-        format.html { redirect_to @property, notice: "Property was successfully updated." }
-        format.json { render :show, status: :ok, location: @property }
+        format.html { redirect_to organization_property_path(@organization, @property), notice: "Property was successfully updated." }
+        format.json { render :show, status: :ok, location: organization_property_path(@organization, @property) }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @property.errors, status: :unprocessable_entity }
@@ -47,36 +49,36 @@ class PropertiesController < ApplicationController
     end
   end
 
-  # DELETE /properties/1 or /properties/1.json
+  # DELETE /organizations/:organization_id/properties/:id
   def destroy
     @property.destroy!
-
     respond_to do |format|
-      format.html { redirect_to properties_path, status: :see_other, notice: "Property was successfully destroyed." }
+      format.html { redirect_to organization_properties_path(@organization), status: :see_other, notice: "Property was successfully destroyed." }
       format.json { head :no_content }
     end
   end
+
   def make_default_checklist
-   puts "make_default_checklist"
-   puts "params: #{params.inspect}" 
-   puts "params[:checklist_id]: #{params[:checklist_id]}"
-     @checklist = Checklist.find(params[:checklist_id])
+    @checklist = Checklist.find(params[:checklist_id])
   
     if @property.update(default_checklist: @checklist)
-      redirect_to property_checklists_path(@property), notice: "Default checklist updated!"
+      redirect_to organization_property_checklists_path(@organization, @property), notice: "Default checklist updated!"
     else
-      redirect_to property_checklists_path(@property), alert: "Failed to update default checklist."
+      redirect_to organization_property_checklists_path(@organization, @property), alert: "Failed to update default checklist."
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_property
-      @property = Property.find(params.expect(:id))
+
+    def set_organization
+      @organization = Organization.find(params[:organization_id])
     end
 
-    # Only allow a list of trusted parameters through.
+    def set_property
+      @property =  Property.find(params[:id])
+    end
+
     def property_params
-      params.expect(property: [ :name, :address, :checklist_id ])
+      params.require(:property).permit(:name, :address)
     end
 end

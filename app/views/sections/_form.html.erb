@@ -3,7 +3,7 @@
   <div class="bg-gray-50 rounded-lg p-4">
     <h3 class="text-lg font-semibold mb-3"><%= section.new_record? ? "Add New Section" : "Edit Section" %></h3>
     
-    <%= form_with model: [organization, checklist, section], class: "flex" do |form| %>
+    <%= form_with model: [organization,  checklist, section], class: "flex" do |form| %>
       <div class="flex-grow mr-2">
         <%= form.text_field :title, placeholder: "Section title", class: "w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>

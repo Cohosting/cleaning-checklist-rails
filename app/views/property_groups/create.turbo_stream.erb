@@ -1,0 +1,40 @@
+<%# app/views/property_groups/create.turbo_stream.erb %>
+<% if @property_group.persisted? %>
+  <%# Add the new property group to the list %>
+  <%= turbo_stream.append "property-groups-list" do %>
+    <%= render partial: "property_groups/property_group", locals: { property_group: @property_group, property: @property } %>
+  <% end %>
+  
+  <%# Remove the "no areas" message if this is the first area %>
+  <%= turbo_stream.update "no-property-groups-message", "" %>
+  
+  <%# Show the container if it was hidden (first item) %>
+  <% if @property.property_groups.count == 1 %>
+    <%= turbo_stream.replace "property-groups-container" do %>
+      <div id="property-groups-container" class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul id="property-groups-list" class="divide-y divide-gray-200">
+          <%= render partial: "property_groups/property_group", locals: { property_group: @property_group, property: @property } %>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
+  
+  <%# Reset the form back to the "Add Area" button - CRITICAL FIX HERE %>
+  <%= turbo_stream.replace "add_area_form" do %>
+    <%= turbo_frame_tag "add_area_form" do %>
+      <%= link_to new_organization_property_property_group_path(@property.organization, @property), 
+                data: { turbo_frame: "add_area_form" },
+                class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Add Area
+      <% end %>
+    <% end %>
+  <% end %>
+  
+  <%# Show a flash message %>
+  <%= turbo_stream.replace "flash" do %>
+    <%= render partial: "shared/flash", locals: { message: "Area added successfully" } %>
+  <% end %>
+<% end %>

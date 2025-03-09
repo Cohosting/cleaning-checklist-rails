@@ -11,7 +11,7 @@
     <% @properties.each do |property| %>
       <li>
         <strong><%= property.name %></strong>
-        <%= link_to "View", property_path(property), class: "btn" %>
+        <%= link_to "View", organization_property_path(@organization ,property), class: "btn" %>
       </li>
     <% end %>
   </ul>

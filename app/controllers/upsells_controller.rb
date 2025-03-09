@@ -1,35 +1,35 @@
 class UpsellsController < ApplicationController
   include StripeCheckout
 
-  before_action :set_property
-  before_action :set_upsell, only: %i[show edit update destroy checkout]
+  before_action :set_organization
+  before_action :set_upsell, only: %i[show edit update destroy checkout edit_properties update_properties]
 
-  # GET /properties/:property_id/upsells
+  # GET /organizations/:organization_id/upsells
   def index
-    @upsells = @property.upsells
+    @upsells = @organization.upsells
   end
 
-  # GET /properties/:property_id/upsells/1
+  # GET /organizations/:organization_id/upsells/1
   def show
   end
 
-  # GET /properties/:property_id/upsells/new
+  # GET /organizations/:organization_id/upsells/new
   def new
-    @upsell = @property.upsells.new
+    @upsell = @organization.upsells.new
   end
 
-  # GET /properties/:property_id/upsells/1/edit
+  # GET /organizations/:organization_id/upsells/1/edit
   def edit
   end
 
-  # POST /properties/:property_id/upsells
+  # POST /organizations/:organization_id/upsells
   def create
-    @upsell = @property.upsells.new(upsell_params)
+    @upsell = @organization.upsells.new(upsell_params)
 
     respond_to do |format|
       if @upsell.save
-        format.html { redirect_to property_upsell_path(@property, @upsell), notice: "Upsell was successfully created." }
-        format.json { render :show, status: :created, location: property_upsell_path(@property, @upsell) }
+        format.html { redirect_to organization_upsell_path(@organization, @upsell), notice: "Upsell was successfully created." }
+        format.json { render :show, status: :created, location: organization_upsell_path(@organization, @upsell) }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @upsell.errors, status: :unprocessable_entity }
@@ -37,12 +37,12 @@ class UpsellsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /properties/:property_id/upsells/1
+  # PATCH/PUT /organizations/:organization_id/upsells/1
   def update
     respond_to do |format|
       if @upsell.update(upsell_params)
-        format.html { redirect_to property_upsell_path(@property, @upsell), notice: "Upsell was successfully updated." }
-        format.json { render :show, status: :ok, location: property_upsell_path(@property, @upsell) }
+        format.html { redirect_to organization_upsell_path(@organization, @upsell), notice: "Upsell was successfully updated." }
+        format.json { render :show, status: :ok, location: organization_upsell_path(@organization, @upsell) }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @upsell.errors, status: :unprocessable_entity }
@@ -50,35 +50,70 @@ class UpsellsController < ApplicationController
     end
   end
 
-  # DELETE /properties/:property_id/upsells/1
+  # DELETE /organizations/:organization_id/upsells/1
   def destroy
     @upsell.destroy!
     respond_to do |format|
-      format.html { redirect_to property_upsells_path(@property), status: :see_other, notice: "Upsell was successfully deleted." }
+      format.html { redirect_to organization_upsells_path(@organization), status: :see_other, notice: "Upsell was successfully deleted." }
       format.json { head :no_content }
     end
   end
 
-  # POST /properties/:property_id/upsells/1/checkout
+  # POST /organizations/:organization_id/upsells/1/checkout
   def checkout
-    session = create_checkout_session(@upsell)
-    @upsell.update(stripe_checkout_session_id: session.id)
+    ActiveRecord::Base.transaction do
+      session = create_checkout_session(@upsell)
+      @upsell.update!(stripe_checkout_session_id: session.id)
+    end
     redirect_to session.url, allow_other_host: true
   rescue Stripe::StripeError => e
     flash[:error] = "Payment error: #{e.message}"
-    redirect_to property_upsell_path(@property, @upsell)
+    redirect_to organization_upsell_path(@organization, @upsell)
+  end
+
+  def edit_properties
+    @properties = Property.order(:name)
+    @properties = @properties.search(params[:search]) if params[:search].present?
+    @selected_property_ids = @upsell.property_ids
+    
+    respond_to do |format|
+      format.html
+      format.js # For AJAX pagination and search
+    end
+  end
+  
+  def update_properties
+    @upsell.properties = params[:property_ids].present? ? Property.where(id: params[:property_ids]) : []
+    
+    redirect_to   edit_properties_organization_upsell_path(@organization, @upsell), notice: "Upsell properties updated."
+  end
+  def reorder
+    # Get the parameters
+    upsell_id = params[:id]
+    new_position = params[:position].to_i
+    
+    # Find the upsell
+    upsell = @organization.upsells.find(upsell_id)
+    
+    # Update the position
+    upsell.insert_at(new_position)
+    
+    # Return a success response
+    head :ok
   end
 
   private
 
-  # Find Property from Nested Route
-  def set_property
-    @property = Property.find(params[:property_id])
-  end
+  # Find Organization from Nested Route
+  def set_organization
+    @organization =  Organization.includes(:upsells).find(params[:organization_id])
+                 
+  end 
 
-  # Find Upsell Belonging to Property
+  # Find Upsell Belonging to Organization
   def set_upsell
-    @upsell = @property.upsells.find(params[:id])
+    @upsell = @organization.upsells.find(params[:id])
+    puts @upsell.inspect
   end
 
   # Strong Params: Allow Only Permitted Fields
@@ -86,3 +121,4 @@ class UpsellsController < ApplicationController
     params.require(:upsell).permit(:title, :description, :price)
   end
 end
+

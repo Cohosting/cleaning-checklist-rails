@@ -57,19 +57,7 @@ class GroupsController < ApplicationController
     end
   end
 
-  def destroy
-    @group.destroy
-    
-    respond_to do |format|
-      format.turbo_stream { 
-        render turbo_stream: [
-          turbo_stream.remove(@group),
-          turbo_stream.prepend("flash_messages", partial: "shared/flash", locals: { message: "Group deleted!", type: "success" })
-        ]
-      }
-      format.html { redirect_to organization_groups_path(@organization), notice: "Group deleted!" }
-    end
-  end
+   
 
   private
   

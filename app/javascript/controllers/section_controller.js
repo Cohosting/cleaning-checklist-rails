@@ -108,25 +108,46 @@ export default class extends Controller {
       
       if (contentType && contentType.includes('text/vnd.turbo-stream.html')) {
         return response.text().then(html => {
-          console.log('Received Turbo Stream HTML:', html);
+          console.log("Received Turbo Stream HTML:", html);
           const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const streamElements = doc.querySelectorAll('turbo-stream');
-          
+          const doc = parser.parseFromString(html, "text/html");
+          const streamElements = doc.querySelectorAll("turbo-stream");
+
           if (streamElements.length > 0) {
-            streamElements.forEach(streamElement => {
+            streamElements.forEach((streamElement) => {
               // Process each turbo-stream element
               Turbo.renderStreamMessage(streamElement.outerHTML);
             });
           } else {
-            console.warn('No turbo-stream elements found in response');
+            console.warn("No turbo-stream elements found in response");
             // Fallback - reload only if necessary
             window.location.reload();
+          }
+
+          // After successful addition, remove the selected option from dropdown
+          if (this.hasGroupSelectTarget) {
+            const selectedOption = this.groupSelectTarget.querySelector(
+              `option[value="${groupId}"]`
+            );
+            if (selectedOption) {
+              selectedOption.remove();
+            }
           }
         });
       } else if (contentType && contentType.includes('application/json')) {
         return response.json().then(data => {
-          console.log('Received JSON response:', data);
+          console.log("Received JSON response:", data);
+
+          // After successful addition, remove the selected option from dropdown
+          if (this.hasGroupSelectTarget) {
+            const selectedOption = this.groupSelectTarget.querySelector(
+              `option[value="${groupId}"]`
+            );
+            if (selectedOption) {
+              selectedOption.remove();
+            }
+          }
+
           // Handle JSON response - might need to refresh
           window.location.reload();
         });

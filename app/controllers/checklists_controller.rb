@@ -1,7 +1,7 @@
-# app/controllers/checklists_controller.rb
 class ChecklistsController < ApplicationController
   before_action :set_organization
-  before_action :set_checklist, only: [:show, :edit, :update, :destroy]
+   before_action :set_checklist, only: [:show, :edit, :update, :destroy]
+
   def index
     @checklists = @organization.checklists
     @new_checklist = @organization.checklists.build
@@ -12,28 +12,27 @@ class ChecklistsController < ApplicationController
     @new_section = @checklist.sections.build
   end
 
-
   def new
     @checklist = @organization.checklists.build
   end
 
-
   def create
     @checklist = @organization.checklists.build(checklist_params)
+    @checklist.organization = @organization  # Ensuring `organization_id` is assigned
 
     respond_to do |format|
       if @checklist.save
         format.turbo_stream { 
           render turbo_stream: [
-            turbo_stream.append("checklists", partial: "checklists/checklist", locals: { checklist: @checklist, organization: @organization }),
-            turbo_stream.update("new_checklist", partial: "checklists/form", locals: { checklist: @organization.checklists.build, organization: @organization }),
+            turbo_stream.append("checklists", partial: "checklists/checklist", locals: { checklist: @checklist, organization: @organization, property: @property }),
+            turbo_stream.update("new_checklist", partial: "checklists/form", locals: { checklist: @organization.checklists.build, organization: @organization, property: @property }),
             turbo_stream.prepend("flash_messages", partial: "shared/flash", locals: { message: "Checklist created!", type: "success" })
           ]
         }
-        format.html { redirect_to organization_checklists_path(@organization), notice: "Checklist created!" }
+        format.html { redirect_to organization_property_checklists_path(@organization, @property), notice: "Checklist created!" }
       else
         format.turbo_stream { 
-          render turbo_stream: turbo_stream.update("new_checklist", partial: "checklists/form", locals: { checklist: @checklist, organization: @organization })
+          render turbo_stream: turbo_stream.update("new_checklist", partial: "checklists/form", locals: { checklist: @checklist, organization: @organization, property: @property })
         }
         format.html { render :new }
       end
@@ -48,14 +47,14 @@ class ChecklistsController < ApplicationController
       if @checklist.update(checklist_params)
         format.turbo_stream { 
           render turbo_stream: [
-            turbo_stream.replace(@checklist, partial: "checklists/checklist", locals: { checklist: @checklist }),
+            turbo_stream.replace(@checklist, partial: "checklists/checklist", locals: { checklist: @checklist, property: @property }),
             turbo_stream.prepend("flash_messages", partial: "shared/flash", locals: { message: "Checklist updated!", type: "success" })
           ]
         }
-        format.html { redirect_to checklist_path(@checklist), notice: "Checklist updated!" }
+        format.html { redirect_to organization_property_checklist_path(@organization, @property, @checklist), notice: "Checklist updated!" }
       else
         format.turbo_stream { 
-          render turbo_stream: turbo_stream.replace("checklist_#{@checklist.id}_form", partial: "checklists/form", locals: { checklist: @checklist })
+          render turbo_stream: turbo_stream.replace("checklist_#{@checklist.id}_form", partial: "checklists/form", locals: { checklist: @checklist, property: @property })
         }
         format.html { render :edit }
       end
@@ -72,7 +71,7 @@ class ChecklistsController < ApplicationController
           turbo_stream.prepend("flash_messages", partial: "shared/flash", locals: { message: "Checklist deleted!", type: "success" })
         ]
       }
-      format.html { redirect_to checklists_path, notice: "Checklist deleted!" }
+      format.html { redirect_to organization_property_checklists_path(@organization, @property), notice: "Checklist deleted!" }
     end
   end
 
@@ -81,12 +80,14 @@ class ChecklistsController < ApplicationController
   def set_organization
     @organization = Organization.find(params[:organization_id])
   end
+
+   
   
   def set_checklist
     @checklist = @organization.checklists.find(params[:id])
   end
 
   def checklist_params
-    params.require(:checklist).permit(:name, :completed, :title, :description, :organization_id)
+    params.require(:checklist).permit(:name, :completed, :title, :description, :organization_id, :property_id)
   end
 end
