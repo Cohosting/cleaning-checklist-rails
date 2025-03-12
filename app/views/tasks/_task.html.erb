@@ -23,9 +23,12 @@
       <% end %>
     <% end %>
     
-    <span class="flex-grow text-sm <%= task.completed ? 'line-through text-gray-500' : 'text-gray-800' %>">
-      <%= task.content %>
-    </span>
+<span class="flex-grow text-sm <%= task.completed ? 'line-through text-gray-500' : 'text-gray-800' %>">
+  <%= task.content %>
+  <span class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full <%= task.image_required ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' %>">
+    <%= task.image_required ? "Image Required" : "No Image Required" %>
+  </span>
+</span>
     
     <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
       <%= link_to edit_organization_checklist_section_section_group_task_path(organization, checklist, section, section_group, task), 

@@ -1,12 +1,127 @@
-<h2>Cleaning Job Details</h2>
-<p><strong>Property:</strong> <%= @job.property.name %></p>
-<p><strong>Scheduled Date:</strong> <%= @job.date %></p>
+<%# app/views/job_shares/show.html.erb %>
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <h2 class="text-xl font-medium text-gray-800 mb-4">Cleaning Job Details</h2>
+  
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <p class="mb-2"><strong>Property:</strong> <%= @job.property.name %></p>
+    <p class="mb-2"><strong>Scheduled Date:</strong> <%= @job.date.strftime('%B %d, %Y') %></p>
+    <p class="mb-2">
+      <strong>Status:</strong>
+      <% if @job.status == "scheduled" %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          Scheduled
+        </span>
+      <% else %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          In Progress
+        </span>
+      <% end %>
+    </p>
+  </div>
 
-<!-- Listen for Turbo Stream updates -->
-<%= turbo_stream_from "job_#{@job.id}_tasks" %>
+  <!-- Listen for Turbo Stream updates -->
+  <%= turbo_stream_from "job_#{@job.id}_tasks" %>
 
-<h3>Tasks</h3>
-<!-- Wrap the task list inside a container with an ID that matches the broadcast target -->
-<div id="job_tasks">
-  <%= render partial: "job_shares/job_tasks", locals: { job: @job } %>
+  <h3 class="text-lg font-medium text-gray-700 mb-4">Tasks</h3>
+  
+  <!-- Wrap the task list inside a container with an ID that matches the broadcast target -->
+  <div id="job_tasks">
+    <% if @job.status == "scheduled" %>
+      <!-- Job not started yet -->
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+              This job has not been started yet. Tasks will appear here once the cleaner begins work.
+            </p>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <!-- Job is in progress, show actual tasks -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-4 py-5 sm:p-6">
+          <!-- Progress counter -->
+          <div class="mb-6 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Cleaning Progress</h3>
+            <div class="text-sm text-gray-500">
+              <%= @job.job_tasks.where(completed: true).count %>/<%= @job.job_tasks.count %> completed
+            </div>
+          </div>
+          
+          <!-- Sections with minimal styling but clear hierarchy -->
+          <div class="space-y-4">
+            <% @job_sections.each do |section| %>
+              <!-- Section -->
+              <div class="mb-6">
+                <!-- Section header -->
+                <div class="flex items-center mb-2">
+                  <div class="h-5 w-5 rounded-full bg-blue-400 mr-2"></div>
+                  <h4 class="text-base font-medium text-gray-800"><%= section.title %></h4>
+                </div>
+                
+                <% section.job_section_groups.each do |section_group| %>
+                  <!-- Group with indent -->
+                  <div class="ml-8 mb-4">
+                    <!-- Group header -->
+                    <div class="flex items-center mb-2">
+                      <h5 class="text-base font-medium text-gray-700"><%= section_group.name %> <%= section_group.display_suffix %> </h5>
+                    </div>
+                    
+                    <!-- Tasks with indent -->
+                    <div class="ml-8 space-y-2">
+                      <% section_group.job_tasks.order(:position).each do |task| %>
+                        <div class="flex items-start">
+                          <div class="flex items-center h-6 mr-2">
+                            <!-- Read-only checkbox -->
+                            <% if task.completed? %>
+                              <svg class="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                              </svg>
+                            <% else %>
+                              <svg class="h-4 w-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                              </svg>
+                            <% end %>
+                          </div>
+                          
+                          <div class="flex-1">
+                            <span class="<%= task.completed? ? 'line-through text-gray-400' : 'text-gray-700' %> text-sm">
+                              <%= task.content %>
+                              <% if task.image_required? && !task.images.attached? %>
+                                <span class="text-red-500 text-xs ml-2">(Image Required)</span>
+                              <% end %>
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <!-- Image rendering section -->
+                        <% if task.images.attached? %>
+                          <div class="ml-6 mt-2 flex flex-wrap gap-2">
+                            <% task.images.each do |image| %>
+                              <div class="relative">
+                                <%= image_tag image.variant(resize_to_limit: [150, 150]), 
+                                    class: "rounded-md border border-gray-200 h-36 w-36 object-cover cursor-pointer" %>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% elsif task.image_required? %>
+ 
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>

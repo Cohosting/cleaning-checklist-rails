@@ -1,9 +1,14 @@
 <!-- app/views/tasks/_form.html.erb -->
 <%= turbo_frame_tag dom_id(task, :form) do %>
   <div class="py-1.5 px-1">
-    <%= form_with model: [organization, checklist, section, section_group, task], class: "flex" do |form| %>
+    <%= form_with model: [organization, checklist, section, section_group, task], class: "flex items-center" do |form| %>
       <div class="flex-grow mr-2">
         <%= form.text_field :content, placeholder: "Add a to-do", class: "w-full px-3 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-gray-400" %>
+      </div>
+      
+      <div class="flex items-center mr-3">
+        <%= form.check_box :image_required, class: "mr-1 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" %>
+        <%= form.label :image_required, "Image Required", class: "text-sm text-gray-700" %>
       </div>
       
       <%= form.submit task.new_record? ? "Add" : "Update", class: "px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 rounded-full text-sm hover:bg-gray-200" %>

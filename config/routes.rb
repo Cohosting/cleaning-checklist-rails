@@ -63,9 +63,18 @@ Rails.application.routes.draw do
 
       patch :make_default_checklist, on: :member
       resources :jobs, only: [:index, :new, :create, :show] do
+
+      member do
+          post :take_snapshot
+      end
+
+
         resources :job_tasks do
           member do
+            post :upload_images
+
             delete :remove_image
+
           end
         end
       end

@@ -1,57 +1,288 @@
-<div class="job-details-container">
-  <!-- Navigation -->
-  <%= link_to organization_property_jobs_path(@job.property), class: "back-link" do %>
-    <i class="fas fa-arrow-left mr-2"></i>
-    Back to Jobs
-  <% end %>
-
-  <!-- Header -->
-  <div class="property-header">
-    <div class="property-header-content">
-      <div class="property-info">
-        <h1><%= @job.property.name %></h1>
-        <p class="property-address">
-          <i class="fas fa-home mr-2"></i>
-          <%= @job.property.address %>
-        </p>
-      </div>
-      <div class="job-info">
-        <div class="job-date">
-          <i class="fas fa-calendar mr-2 text-gray-600"></i>
-          <span><%= @job.date.strftime("%Y-%m-%d") %></span>
-        </div>
-      </div>
+<%# app/views/jobs/show.html.erb %>
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <!-- Header area -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-xl font-medium text-gray-800"><%= @job.property.name %></h1>
+    <div class="flex items-center gap-4">
+      <span class="text-gray-500 text-sm"><%= @job.date.strftime('%B %d, %Y') %></span>
+      <%= link_to "← Back", organization_property_jobs_path(@job.property.organization, @job.property), 
+          class: "text-blue-600 hover:text-blue-800 text-sm" %>
     </div>
   </div>
-
-  <!-- Tasks Section -->
-  <div class="tasks-section">
-    <h2 class="tasks-title">Tasks</h2>
-    
- <!-- Add New Task Form -->
-<%= form_with(url: property_job_job_tasks_path(@job.property, @job), 
-             method: :post,
-             local: true, 
-             class: "new-task-form") do |f| %>
-  <div class="form-group">
-    <%= f.text_field :name, 
-        placeholder: "Add a new task...", 
-        class: "task-input",
-        required: true %>
-    <%= button_tag type: 'submit', class: "add-task-btn" do %>
-      <i class="fas fa-plus mr-2"></i>
-      Add Task
-    <% end %>
+ <%# render alert %>
+<% if flash[:alert] %>
+  <div class="alert alert-danger">
+    <%= flash[:alert] %>
   </div>
 <% end %>
 
-    <!-- Tasks List -->
-    <div class="tasks-list">
-
-  <%= render @job.job_tasks, job: @job %>
-
-    </div>
-    <%= link_to "Share Job", job_share_url(@job.public_token), target: "_blank", rel: "noopener" %>
-
+<% if flash[:notice] %>
+  <div class="alert alert-success">
+    <%= flash[:notice] %>
   </div>
+<% end %>
+
+  <!-- Job details -->
+  <div class="bg-white shadow rounded-lg p-6 mb-8">
+    
+    
+    <div class="flex items-center mb-4">
+      <div class="h-8 w-8 rounded-full bg-blue-400 mr-4"></div>
+      <div>
+        <div class="text-sm text-gray-500">Status</div>
+        <div class="text-base font-medium text-gray-800"><%= @job.status.titleize %></div>
+      </div>
+    </div>
+    <%# Render public token %>
+
+    <div class="flex items-center mb-4">
+      <div class="h-8 w-8 rounded-full bg-blue-400 mr-4"></div>
+      <div>
+        <div class="text-sm text-gray-500">Public Token</div>
+        <div class="text-base font-medium text-gray-800"><%= @job.public_token %></div>
+      </div>
+    </div>    
+  </div>
+ 
+    
+
+
+  <% if @job.snapshot_at.present? %>
+    <!-- CASE 1: Job has snapshot, show job sections -->
+    <% if @job_sections.empty? %>
+      <div class="text-gray-500 py-4 text-center">
+        <p>This job doesn't have any sections or tasks yet.</p>
+      </div>
+    <% else %>
+      <!-- Progress counter -->
+      <div class="mb-6 flex justify-between items-center">
+        <h2 class="text-base font-medium text-gray-700">Checklist</h2>
+        <div class="text-sm text-gray-500">
+          <%= @job.job_tasks.where(completed: true).count %>/<%= @job.job_tasks.count %> completed
+        </div>
+      </div>
+      
+      <!-- Sections with minimal styling but clear hierarchy -->
+      <div class="space-y-4">
+        <% @job_sections.each do |section| %>
+          <!-- Section -->
+          <div class="mb-6">
+            <!-- Section header -->
+            <div class="flex items-center mb-2">
+              <button class="text-gray-400 mr-2">−</button>
+              <div class="h-5 w-5 rounded-full bg-blue-400 mr-2"></div>
+              <h3 class="text-base font-medium text-gray-800"><%= section.title %></h3>
+              <div class="ml-auto flex items-center">
+              </div>
+            </div>
+            
+            <% section.job_section_groups.each do |section_group| %>
+              <!-- Group with indent -->
+              <div class="ml-8 mb-4">
+                <!-- Group header -->
+                <div class="flex items-center mb-2">
+                  <button class="text-gray-400 mr-2">−</button>
+                  <h4 class="text-base font-medium text-gray-700"><%= section_group.name %> <%= section_group.display_suffix %> </h4>
+                </div>
+                
+                <!-- Tasks with indent -->
+                <div class="ml-8 space-y-2">
+                  <% section_group.job_tasks.each do |task| %>
+                    <div class="flex items-start group">
+                      <div class="flex items-center h-6 mr-2">
+                        <%= form_with(
+                              url: organization_property_job_job_task_path(
+                                @job.property.organization, 
+                                @job.property, 
+                                @job, 
+                                task
+                              ),
+                              method: :patch, 
+                              local: true,
+                              class: "task-form"
+                            ) do |f| %>
+                          <%= f.check_box :completed, 
+                              checked: task.completed?,
+                              name: "job_task[completed]",
+                              onchange: 'this.form.submit()', 
+                              disabled: (task.image_required? && !task.images.attached?),
+                              title: (task.image_required? && !task.images.attached?) ? "Upload images before marking complete" : "",
+                              class: 'h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500' %>
+                        <% end %>
+                        <% if task.image_required? && !task.images.attached? %>
+                          <div class="ml-2 text-xs text-amber-600 tooltip cursor-help" title="Upload images before marking complete">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                          </div>
+                        <% end %>
+                      </div>
+                      
+                      <div class="flex-1">
+                        <div class="flex items-center">
+                          <span class="flex-grow text-sm <%= task.completed ? 'line-through text-gray-500' : 'text-gray-800' %>">
+  <%= task.content %>
+  <span class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full <%= task.image_required ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' %>">
+    <%= task.image_required ? "Image Required" : "No Image Required" %>
+  </span>
+</span>
+                        </div>
+                        
+                        <% if task.image_required %>
+                          <!-- Image upload form -->
+                          <div class="mt-2">
+                            <% if !task.images.attached? %>
+                              <div class="text-amber-600 text-xs flex items-center mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Upload required images before marking as complete
+                              </div>
+                            <% end %>
+                            <%= form_with(
+                                  url: upload_images_organization_property_job_job_task_path(
+                                    @job.property.organization, 
+                                    @job.property, 
+                                    @job, 
+                                    task
+                                  ),
+                                  method: :post,
+                                  multipart: true
+                                ) do |f| %>
+                              <div class="flex items-center">
+                                <%= f.file_field :images, 
+                                    multiple: true, 
+                                    direct_upload: true,
+                                    accept: "image/*",
+                                    class: "text-sm text-gray-500 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+                                <%= f.submit "Upload", 
+                                    class: "ml-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" %>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                        
+                        <% if task.images.attached? %>
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            <% task.images.each do |image| %>
+                              <div class="relative group">
+                                <%= image_tag image.variant(resize_to_limit: [80, 80]), 
+                                    class: "rounded-md border border-gray-200 h-20 w-20 object-cover" %>
+ <%= button_to "×", 
+    remove_image_organization_property_job_job_task_path(
+      @job.property.organization, 
+      @job.property, 
+      @job, 
+      task,
+      image_id: image.id
+    ), 
+    method: :delete, 
+    class: "absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100", 
+    data: { confirm: "Remove this image?" } %>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- CASE 2: No snapshot, render checklist structure with property group logic -->
+    <% if @checklist.nil? || @checklist.sections.empty? %>
+      <div class="text-gray-500 py-4 text-center">
+        <p>This job doesn't have a checklist assigned or the checklist is empty.</p>
+      </div>
+    <% else %>
+      <!-- Start Job button -->
+      <div class="mb-6 flex justify-center">
+        <%= button_to "Start Working on This Job", 
+            take_snapshot_organization_property_job_path(
+              @job.property.organization, 
+              @job.property, 
+              @job
+            ), 
+            method: :post, 
+            class: "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" %>
+      </div>
+      
+      <!-- Progress counter -->
+      <div class="mb-6 flex justify-between items-center">
+        <h2 class="text-base font-medium text-gray-700">Checklist Preview</h2>
+        <div class="text-sm text-gray-500">
+          <span class="italic">Preview mode</span>
+        </div>
+      </div>
+      
+      <!-- Dynamically render checklist sections -->
+      <div class="space-y-4">
+        <% @checklist.sections.order(:position).each do |section| %>
+          <!-- Section -->
+          <div class="mb-6">
+            <!-- Section header -->
+            <div class="flex items-center mb-2">
+              <button class="text-gray-400 mr-2">−</button>
+              <div class="h-5 w-5 rounded-full bg-blue-400 mr-2"></div>
+              <h3 class="text-base font-medium text-gray-800"><%= section.title %></h3>
+            </div>
+            
+            <% section.section_groups.order(:position).each do |section_group| %>
+              <% 
+                # Check if this group exists in the property's groups
+                property_group = @property_groups[section_group.group_id]
+                # Skip this section group if property doesn't have this group
+                next unless property_group
+                
+                # Get the quantity (default to 1 if not specified)
+                quantity = property_group.quantity.presence || 1
+              %>
+              
+              <% quantity.times do |instance_index| %>
+                <% 
+                  # Add suffix for multiple instances (e.g., "Bathroom #1")
+                  suffix = quantity > 1 ? " ##{instance_index + 1}" : ""
+                %>
+                
+                <!-- Group with indent -->
+                <div class="ml-8 mb-4">
+                  <!-- Group header -->
+                  <div class="flex items-center mb-2">
+                    <button class="text-gray-400 mr-2">−</button>
+                    <h4 class="text-base font-medium text-gray-700"><%= section_group.group.name %><%= suffix %></h4>
+                  </div>
+                  
+                  <!-- Tasks with indent -->
+                  <div class="ml-8 space-y-2">
+                    <% section_group.tasks.order(:position).each do |task| %>
+                      <div class="flex items-start group">
+                        <div class="flex items-center h-6 mr-2">
+                          <!-- Disabled checkbox for preview -->
+                          <input type="checkbox" disabled class="h-4 w-4 rounded border-gray-300 text-blue-200 focus:ring-blue-300">
+                        </div>
+                        
+                        <div class="flex-1">
+                          <div class="flex items-center">
+                            <span class="text-gray-700 text-sm">
+                              <%= task.content %>
+                              
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
 </div>

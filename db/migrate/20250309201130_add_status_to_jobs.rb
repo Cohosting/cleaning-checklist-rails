@@ -1,0 +1,5 @@
+class AddStatusToJobs < ActiveRecord::Migration[8.0]
+  def change
+    add_column :jobs, :status, :string, default: 'scheduled'
+  end
+end

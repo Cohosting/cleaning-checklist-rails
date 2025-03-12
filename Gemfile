@@ -80,3 +80,5 @@ gem 'acts_as_list'
 group :production do
   gem "pg", "~> 1.2"
 end
+
+gem "image_processing", "~> 1.2"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_11_062712) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -82,13 +82,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
     t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
-  create_table "job_tasks", force: :cascade do |t|
+  create_table "job_section_groups", force: :cascade do |t|
+    t.integer "job_section_id", null: false
+    t.integer "group_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "instance_number", default: 0, null: false
+    t.string "display_suffix", default: "", null: false
+    t.string "name", default: "", null: false
+    t.text "description", default: "", null: false
+    t.index ["group_id"], name: "index_job_section_groups_on_group_id"
+    t.index ["job_section_id"], name: "index_job_section_groups_on_job_section_id"
+  end
+
+  create_table "job_sections", force: :cascade do |t|
+    t.string "title"
+    t.integer "position"
     t.integer "job_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_job_sections_on_job_id"
+  end
+
+  create_table "job_tasks", force: :cascade do |t|
     t.string "name"
     t.boolean "completed", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["job_id"], name: "index_job_tasks_on_job_id"
+    t.integer "job_section_group_id", null: false
+    t.string "content"
+    t.integer "position", default: 0
+    t.boolean "image_required", default: false
+    t.index ["job_section_group_id"], name: "index_job_tasks_on_job_section_group_id"
   end
 
   create_table "jobs", force: :cascade do |t|
@@ -98,6 +124,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "public_token"
+    t.string "status", default: "scheduled"
+    t.datetime "snapshot_at"
     t.index ["checklist_id"], name: "index_jobs_on_checklist_id"
     t.index ["property_id"], name: "index_jobs_on_property_id"
     t.index ["public_token"], name: "index_jobs_on_public_token"
@@ -202,6 +230,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
     t.string "content"
     t.integer "position"
     t.integer "section_group_id"
+    t.boolean "image_required", default: false
     t.index ["section_group_id"], name: "index_tasks_on_section_group_id"
   end
 
@@ -244,7 +273,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_112536) do
   add_foreign_key "checklists", "organizations"
   add_foreign_key "groups", "organizations"
   add_foreign_key "invitations", "organizations"
-  add_foreign_key "job_tasks", "jobs"
+  add_foreign_key "job_section_groups", "groups"
+  add_foreign_key "job_section_groups", "job_sections"
+  add_foreign_key "job_sections", "jobs"
+  add_foreign_key "job_tasks", "job_section_groups"
   add_foreign_key "jobs", "checklists"
   add_foreign_key "jobs", "properties"
   add_foreign_key "memberships", "organizations"

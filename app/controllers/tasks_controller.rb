@@ -110,7 +110,7 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    params.require(:task).permit(:content, :completed)
+    params.require(:task).permit(:content, :completed, :image_required)  
   end
    
   def reorder_tasks(section_group)
