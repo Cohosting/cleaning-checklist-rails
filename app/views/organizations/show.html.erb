@@ -43,8 +43,50 @@
     </div>
     <div>
       <%= form.label :role, "Role", class: "block text-sm font-medium text-gray-700" %>
-      <%= form.select :role, ["member", "admin"], {}, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" %>
+      <%= form.select :role, ["member", "admin" , "contractor"], {}, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" %>
     </div>
     <%= form.submit "Invite", class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" %>
   <% end %>
 </div>
+
+<!-- In app/views/organizations/show.html.erb -->
+<% if Current.user.memberships.exists?(organization: @organization) %>
+  <!-- User is a direct member -->
+  <% if Current.user.contractor_in?(@organization) %>
+    <!-- User is a contractor -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h3>Manage Subcontractors</h3>
+      </div>
+      <div class="card-body">
+        <h4>Your Subcontractors</h4>
+        <ul class="list-group">
+          <% Current.user.subcontractors.each do |subcontractor| %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= subcontractor.email_address %>
+            </li>
+          <% end %>
+        </ul>
+        
+        <h4 class="mt-4">Invite a Subcontractor</h4>
+        <%= form_with(url: create_subcontractor_organization_invitations_path(@organization), method: :post, class: "mt-3") do |form| %>
+          <div class="mb-3">
+            <%= form.label :email, "Email Address" %>
+            <%= form.email_field :email, class: "form-control" %>
+          </div>
+          <%= form.submit "Invite Subcontractor", class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <!-- User is a subcontractor through a contractor -->
+  <div class="alert alert-info">
+    You have access to this organization as a subcontractor through:
+    <ul>
+      <% @contractors.each do |contractor| %>
+        <li><%= contractor.email_address %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

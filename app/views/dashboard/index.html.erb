@@ -18,6 +18,11 @@
                  <%= link_to organization_upsells_path(@organization), class: "action-link" do %>
             View upsell (<%= @organization.upsells.count %>)
           <% end %>
+
+
+          <%= link_to organization_path(Current.user.organization_id) do  %>
+            View Organization
+          <% end %>
   </div>
 
   <div class="properties-grid">

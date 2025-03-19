@@ -14,6 +14,12 @@ class OrganizationsController < ApplicationController
     end
   end
 
+  def switch
+    organization =  Organization.find(params[:id])
+    Current.user.update(organization_id: organization.id)
+    redirect_back(fallback_location: root_path)
+  end
+
   private
 
   def authorize_access!

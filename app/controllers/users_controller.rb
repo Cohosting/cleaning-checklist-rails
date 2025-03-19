@@ -25,12 +25,45 @@ class UsersController < ApplicationController
       if invited
         invitation = Invitation.find_by(token: @invitation_token)
         if invitation
-          Rails.logger.debug "Adding user to inviting org: #{invitation.organization.name}"
-          invitation.organization.memberships.create!(user: @user, role: invitation.role)
-          invitation.destroy
-          Rails.logger.debug "Added #{@user.email_address} to #{invitation.organization.name}"
-          start_new_session_for(@user)
-          redirect_to organization_path(invitation.organization), notice: "You have successfully joined the organization."
+          organization = invitation.organization
+          
+          if invitation.role == 'subcontractor' && invitation.invited_by_user_id.present?
+            # This is a subcontractor invitation
+            Rails.logger.debug "Processing subcontractor invitation from user #{invitation.invited_by_user_id}"
+            
+            # Create the contractor-subcontractor relationship
+            contractor = User.find(invitation.invited_by_user_id)
+            ContractorSubcontractor.create!(
+              contractor: contractor,
+              subcontractor: @user
+            )
+            
+            # No membership is created, but set organization_id for UI purposes
+            @user.update!(organization_id: organization.id)
+            
+            invitation.destroy
+            start_new_session_for(@user)
+            redirect_to organization_path(organization), 
+                        notice: "You have been added as a subcontractor for #{contractor.email_address}."
+          else
+            # Standard invitation (member, admin, contractor)
+            Rails.logger.debug "Adding user to inviting org: #{organization.name}"
+            organization.memberships.create!(user: @user, role: invitation.role)
+            
+            # If this is a contractor, create their contractor profile
+            if invitation.role == 'contractor'
+              @user.create_contractor_profile unless @user.contractor_profile.present?
+            end
+            
+            # Set organization_id for current context
+            @user.update!(organization_id: organization.id)
+            
+            invitation.destroy
+            Rails.logger.debug "Added #{@user.email_address} to #{organization.name}"
+            start_new_session_for(@user)
+            redirect_to organization_path(organization), 
+                        notice: "You have successfully joined the organization."
+          end
         else
           Rails.logger.debug "Invalid invitation token during acceptance: #{@invitation_token}"
           start_new_session_for(@user)

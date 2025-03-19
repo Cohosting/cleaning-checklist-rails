@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_11_062712) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_15_084853) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -50,6 +50,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_062712) do
     t.index ["organization_id"], name: "index_checklists_on_organization_id"
   end
 
+  create_table "contractor_profiles", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.json "settings", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_contractor_profiles_on_user_id", unique: true
+  end
+
+  create_table "contractor_subcontractors", force: :cascade do |t|
+    t.integer "contractor_id", null: false
+    t.integer "subcontractor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contractor_id", "subcontractor_id"], name: "idx_on_contractor_id_subcontractor_id_38e4f07e74", unique: true
+    t.index ["contractor_id"], name: "index_contractor_subcontractors_on_contractor_id"
+    t.index ["subcontractor_id"], name: "index_contractor_subcontractors_on_subcontractor_id"
+  end
+
   create_table "groups", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -78,6 +96,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_062712) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "role", default: "cleaner", null: false
+    t.integer "invited_by_user_id"
+    t.index ["invited_by_user_id"], name: "index_invitations_on_invited_by_user_id"
     t.index ["organization_id"], name: "index_invitations_on_organization_id"
     t.index ["token"], name: "index_invitations_on_token", unique: true
   end
@@ -271,6 +291,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_062712) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "checklists", "organizations"
+  add_foreign_key "contractor_profiles", "users"
+  add_foreign_key "contractor_subcontractors", "users", column: "contractor_id"
+  add_foreign_key "contractor_subcontractors", "users", column: "subcontractor_id"
   add_foreign_key "groups", "organizations"
   add_foreign_key "invitations", "organizations"
   add_foreign_key "job_section_groups", "groups"

@@ -1,0 +1,5 @@
+<h1>Subcontractor Invitation</h1>
+<p>Hello,</p>
+<p>You have been invited as a subcontractor by <%= @contractor.email_address %> for <%= @organization.name %>.</p>
+<p>Click the link below to accept this invitation:</p>
+<p><%= link_to "Accept Invitation", accept_invitation_url(token: @invitation.token) %></p>

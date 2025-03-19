@@ -1,85 +1,41 @@
-# Clear existing data
-Task.delete_all
-SectionGroup.delete_all
-Section.delete_all
-Checklist.delete_all
-Group.delete_all
-Organization.delete_all
-User.delete_all
+# db/seeds/organizations.rb
+# You can run this with: rails db:seed:organizations
 
-# Create a user
-user = User.create!(
-  email_address: "admin@example.com",
-  password: "password",
-  password_digest: BCrypt::Password.create("password")
-)
+# Find user with ID 1 or skip if not found
+user = User.find_by(id: 1)
 
-# Create an organization
-organization = Organization.create!(
-  name: "Example Home Services",
-  owner: user
-)
+if user.nil?
+  puts "User with ID 1 not found. Please create a user first."
+  exit
+end
 
-# # Create a few groups
-# bedroom = organization.groups.create!(name: "Bedroom", description: "Tasks related to bedroom cleaning")
-# bathroom = organization.groups.create!(name: "Bathroom", description: "Bathroom maintenance")
-# kitchen = organization.groups.create!(name: "Kitchen", description: "Kitchen cleaning")
-# interior = organization.groups.create!(name: "Interior", description: "General interior maintenance and cleaning")
+# Create organizations
+organizations = [
+  { name: "Acme Corporation", owner_id: user.id },
+  { name: "Globex Industries", owner_id: user.id },
+  { name: "Stark Enterprises", owner_id: user.id },
+  { name: "Wayne Innovations", owner_id: user.id },
+  { name: "Umbrella Corp", owner_id: user.id }
+]
 
-# # Create one checklist
-# checklist = organization.checklists.create!(
-#   title: "Property Turnover Checklist",
-#   description: "Checklist for preparing a property between guests"
-# )
+organizations.each do |org_data|
+  org = Organization.find_or_create_by(name: org_data[:name]) do |o|
+    o.owner_id = org_data[:owner_id]
+  end
+  
+  # Create membership if it doesn't exist
+  unless user.memberships.exists?(organization_id: org.id)
+    role = org.owner_id == user.id ? 'admin' : 'member'
+    user.memberships.create!(organization: org, role: role)
+  end
+  
+  puts "Created or updated organization: #{org.name}"
+end
 
-# # Create sections
-# cleaning = checklist.sections.create!(title: "Cleaning")
-# inspection = checklist.sections.create!(title: "Inspection")
-# interior_section = checklist.sections.create!(title: "Interior Maintenance")
+# Set the first organization as the current one for the user
+if user.organization_id.nil? && user.organizations.any?
+  user.update(organization_id: user.organizations.first.id)
+  puts "Set #{user.organizations.first.name} as the current organization for #{user.email_address}"
+end
 
-# # Assign groups to sections
-# cleaning_bedroom = cleaning.section_groups.create!(group: bedroom)
-# cleaning_bathroom = cleaning.section_groups.create!(group: bathroom)
-# cleaning_kitchen = cleaning.section_groups.create!(group: kitchen)
-
-# inspection_general = inspection.section_groups.create!(group: bedroom)
-# inspection_bathroom = inspection.section_groups.create!(group: bathroom)
-
-# interior_group = interior_section.section_groups.create!(group: interior)
-
-# # Add tasks to sections
-# cleaning_bedroom.tasks.create!([
-#   { content: "Change bed linens", completed: false },
-#   { content: "Dust surfaces", completed: false },
-#   { content: "Vacuum floor", completed: false }
-# ])
-
-# cleaning_bathroom.tasks.create!([
-#   { content: "Clean shower", completed: false },
-#   { content: "Restock toiletries", completed: false },
-#   { content: "Disinfect toilet", completed: false }
-# ])
-
-# cleaning_kitchen.tasks.create!([
-#   { content: "Wipe down countertops", completed: false },
-#   { content: "Clean inside microwave", completed: false },
-#   { content: "Take out trash", completed: false }
-# ])
-
-# inspection_general.tasks.create!([
-#   { content: "Check for damages", completed: false },
-#   { content: "Ensure all lightbulbs work", completed: false }
-# ])
-
-# inspection_bathroom.tasks.create!([
-#   { content: "Check plumbing for leaks", completed: false }
-# ])
-
-# interior_group.tasks.create!([
-#   { content: "Dust all vents and fans", completed: false },
-#   { content: "Check and replace air filters if needed", completed: false },
-#   { content: "Inspect and clean windows", completed: false },
-#   { content: "Ensure furniture is in good condition", completed: false }
-# ])
-
-# puts "Seeds created successfully!"
+puts "Finished creating organizations for user #{user.email_address} (ID: #{user.id})"

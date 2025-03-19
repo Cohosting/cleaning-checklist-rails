@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get "/signin", to: "sessions#new", as: :signin
   post "/signin", to: "sessions#create"
   delete "/signout", to: "sessions#destroy", as: :signout
+  get "/invitations/accept/:token", to: "invitations#accept", as: :accept_invitation
 
   # Password reset
   resources :passwords, param: :token
@@ -14,11 +15,20 @@ Rails.application.routes.draw do
   # Invitations
   resources :invitations, only: [] do
     get :accept, on: :collection
+    post :create_subcontractor, on: :collection
+
   end
 
   # Organizations & Related Models
   resources :organizations do
-    resources :invitations, only: :create
+    member do
+      post :switch
+    end
+    resources :invitations, only: :create do
+      collection do
+        post :create_subcontractor
+      end
+    end
 
     # checklists
 

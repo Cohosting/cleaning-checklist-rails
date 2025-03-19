@@ -1,0 +1,13 @@
+<div class="org-switcher">
+  <ul class="org-list">
+    <% Current.user.organizations.each do |org| %>
+      <li class="<%= Current.user.organization_id == org.id ? 'current' : '' %>">
+        <% if Current.user.organization_id == org.id %>
+          <%= org.name %> (Current)
+        <% else %>
+          <%= button_to org.name, switch_organization_path(org), method: :post %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
