@@ -87,7 +87,18 @@ end
       return false unless membership # User must be a member
       membership.role == "admin" || organization.owner_id == id # Admins or owner can invite
     end
-
+    def associated_jobs
+      # Jobs where user is directly assigned through membership
+      direct_jobs = Job.joins(:assigned_to)
+                       .where(memberships: { user_id: id })
+      
+      # Jobs where user is assigned as a subcontractor
+      subcontractor_jobs = Job.joins(:job_assignments)
+                             .where(job_assignments: { subcontractor_id: id })
+      
+      # Return combined unique jobs
+      (direct_jobs + subcontractor_jobs).uniq
+    end
   private
 
 

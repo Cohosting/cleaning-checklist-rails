@@ -23,11 +23,12 @@ class JobCreationService
   private
 
   def create_job
+       
     @job = Job.create!(
       property_id: @property_id,
       checklist_id: @checklist_id,
       date: @date,
-      public_token: SecureRandom.hex(10)
+      public_token: SecureRandom.hex(10),
     )
   end
 

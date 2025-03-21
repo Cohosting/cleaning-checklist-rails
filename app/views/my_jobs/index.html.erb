@@ -1,0 +1,107 @@
+<%# app/views/my_jobs/index.html.erb %>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-6">My Jobs</h1>
+  
+  <% if @jobs.empty? %>
+    <div class="bg-gray-100 rounded-lg p-6 text-center">
+      <p class="text-gray-600">You don't have any jobs assigned to you yet.</p>
+    </div>
+  <% else %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @jobs.each do |job| %>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-sm text-gray-500"><%= job.date.strftime("%B %d, %Y") %></span>
+              
+              <% if job.completion_percentage == 100 %>
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                  Completed
+                </span>
+              <% else %>
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                  In Progress
+                </span>
+              <% end %>
+            </div>
+            
+            <h2 class="text-xl font-semibold mb-2"><%= job.property.address %></h2>
+            
+            <!-- Assignment information -->
+            <div class="mt-2 mb-3">
+              <% if job.assigned_to && job.assigned_to.user_id == Current.user.id %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                  Assigned to you
+                </span>
+              <% elsif job.job_assignments.exists?(subcontractor: Current.user) %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                  </svg>
+                  Assigned as subcontractor
+                </span>
+              <% end %>
+            </div>
+            
+            <div class="mt-4">
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-blue-600 h-2.5 rounded-full" style="width: <%= job.completion_percentage %>%"></div>
+              </div>
+              <div class="flex justify-between text-sm text-gray-600 mt-1">
+                <span><%= job.completed_tasks %> / <%= job.total_tasks %> tasks</span>
+                <span><%= job.completion_percentage %>% complete</span>
+              </div>
+            </div>
+            
+            <!-- Subcontractor Management (Only for contractors with direct assignment) -->
+            <% if job.assigned_to && job.assigned_to.user_id == Current.user.id && Current.user.contractor? %>
+              <div class="mt-4 pt-4 border-t border-gray-200">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Subcontractor Assignments</h3>
+                
+                <% if job.job_assignments.any? %>
+                  <div class="mb-3">
+                    <ul class="space-y-1">
+                      <% job.job_assignments.includes(:subcontractor).each do |assignment| %>
+                        <li class="flex justify-between items-center text-sm">
+                          <span class="text-gray-700"><%= assignment.subcontractor.email_address %></span>
+                          <%= button_to "Remove", remove_subcontractor_my_job_path(job, subcontractor_id: assignment.subcontractor.id), method: :delete, form: { data: { turbo_confirm: "Are you sure?" } }, class: "text-red-600 hover:text-red-900 text-xs" %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+                
+                <!-- Subcontractor Assignment Form -->
+                <% if Current.user.subcontractors.any? %>
+                  <%= form_with(url: assign_subcontractor_my_job_path(job), method: :post, class: "mt-2") do |form| %>
+                    <div class="flex space-x-2">
+                      <%= form.select :subcontractor_id, 
+                                     options_for_select(Current.user.subcontractors
+                                                          .reject { |s| job.job_assignments.exists?(subcontractor: s) }
+                                                          .map { |s| [s.email_address, s.id] }),
+                                     { include_blank: "Add subcontractor..." },
+                                     { class: "block w-full text-sm border-gray-300 rounded-md" } %>
+                      <%= form.submit "Add", class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+                    </div>
+                    <div class="mt-2">
+                      <%= form.text_area :notes, placeholder: "Optional notes...", rows: 2, class: "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md" %>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <p class="text-sm text-gray-500 italic">You don't have any subcontractors to assign.</p>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <div class="mt-6">
+              <%= link_to "View Details", my_job_path(job), class: "block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-200" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

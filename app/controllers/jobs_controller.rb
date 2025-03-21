@@ -1,13 +1,18 @@
 # app/controllers/jobs_controller.rb
 class JobsController < ApplicationController
-  before_action :set_organization_and_property, only: [:new, :create, :index]
-  before_action :set_job_with_associations, only: [:show, :take_snapshot]
+  before_action :set_organization_and_property, only: [:new, :create, :index, :assign, :unassign]
+  before_action :set_job_with_associations, only: [:show, :take_snapshot, :assign, :unassign]
   # Add authorization check if you have a system like Pundit or CanCanCan
   # before_action :authorize_job, only: [:show, :take_snapshot]
 
-  def index
-    @jobs = @property.jobs.includes(:property)
-  end
+def index
+  @property = Property.find(params[:property_id])
+  @organization = Organization.find(params[:organization_id])
+  @jobs = @property.jobs.includes(:job_assignments, :assigned_subcontractors).order(date: :desc)
+  
+  # If current user is a contractor, get their subcontractors for the dropdown
+  @subcontractors = Current.user.contractor? ? Current.user.subcontractors : []
+end
 
   def show
     if @job.snapshot_at.present?
@@ -70,6 +75,44 @@ class JobsController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     flash[:alert] = "Failed to start job: #{e.message}"
     redirect_to organization_property_job_path(@job.property.organization, @job.property, @job)
+  end
+
+  def assign
+    
+    # Check permissions
+    unless Current.user.role_in(@organization) == "admin"
+      redirect_back fallback_location: root_path, alert: "You don't have permission to assign jobs"
+      return
+    end
+    
+    # Find the membership
+    @membership = Membership.find(params[:membership_id])
+    
+    # Update the job's assigned_to attribute
+    if @job.update(assigned_to: @membership)
+      redirect_back fallback_location: organization_property_job_path(@organization, @property, @job), 
+                    notice: "Job successfully assigned"
+    else
+      redirect_back fallback_location: organization_property_job_path(@organization, @property, @job), 
+                    alert: "Failed to assign job: #{@job.errors.full_messages.join(', ')}"
+    end
+  end
+  
+  def unassign
+    # Check permissions
+    unless Current.user.role_in(@organization) == "admin"
+      redirect_back fallback_location: root_path, alert: "You don't have permission to unassign jobs"
+      return
+    end
+    
+    # Remove the assignment
+    if @job.update(assigned_to: nil)
+      redirect_back fallback_location: organization_property_job_path(@organization, @property, @job), 
+                    notice: "Job assignment removed"
+    else
+      redirect_back fallback_location: organization_property_job_path(@organization, @property, @job), 
+                    alert: "Failed to remove job assignment"
+    end
   end
 
   private

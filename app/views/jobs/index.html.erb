@@ -1,49 +1,43 @@
-<div class="jobs-container">
+<!-- app/views/jobs/index.html.erb -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <!-- Header with Property Context -->
-  <div>
-    <%= link_to root_path, class: "back-link" do %>
+  <div class="mb-6">
+    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4" do %>
       <i class="fas fa-arrow-left mr-2"></i>
       Back to Properties
     <% end %>
     
-    <div class="property-card">
-      <h1 class="property-name"><%= @property.name %></h1>
-      <p class="property-address">
+    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+      <h1 class="text-2xl font-bold text-gray-900"><%= @property.name %></h1>
+      <p class="text-gray-600 flex items-center mt-1">
         <i class="fas fa-home mr-2"></i>
         <%= @property.address %>
       </p>
     </div>
   </div>
-
+  
+  <!-- Flash messages -->
+ 
   <!-- Actions -->
-  <div class="jobs-header">
-    <h2 class="jobs-title">Cleaning Jobs</h2>
-    <%= link_to new_organization_property_job_path( @organization, @property), class: "new-job-btn" do %>
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-bold text-gray-900">Cleaning Jobs</h2>
+    <%= link_to new_organization_property_job_path(@organization, @property), 
+              class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
       <i class="fas fa-plus mr-2"></i>
       Schedule New Job
     <% end %>
   </div>
 
   <!-- Jobs List -->
-  <div class="jobs-list">
-    <% @jobs.each do |job| %>
-      <%= link_to organization_property_job_path( @organization, @property, job), class: "job-card" do %>
-        <div class="job-content">
-          <div class="job-info">
-            <i class="fas fa-calendar text-gray-600"></i>
-            <span class="job-date"><%= job.date.strftime("%Y-%m-%d") %></span>
-            <span class="status-badge <%= "status-#{job.status.downcase}" %>">
-              <%= job.status.humanize %>
-            </span>
-          </div>
-          <div class="flex items-center">
-            <span class="job-tasks">
-              <%= job.completed_tasks %>/<%= job.total_tasks %> tasks completed
-            </span>
-            <i class="fas fa-chevron-right text-gray-400"></i>
-          </div>
-        </div>
+  <div class="space-y-4">
+    <% if @jobs.any? %>
+      <% @jobs.each do |job| %>
+        <%= render 'job', job: job, organization: @organization, property: @property %>
       <% end %>
+    <% else %>
+      <div class="bg-white rounded-lg shadow-sm p-8 text-center border border-gray-200">
+        <p class="text-gray-500">No jobs scheduled yet.</p>
+      </div>
     <% end %>
   </div>
 </div>

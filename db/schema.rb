@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_15_084853) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_20_090800) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -102,6 +102,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_084853) do
     t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
+  create_table "job_assignments", force: :cascade do |t|
+    t.integer "job_id", null: false
+    t.integer "subcontractor_id", null: false
+    t.integer "assigned_by_id", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_by_id"], name: "index_job_assignments_on_assigned_by_id"
+    t.index ["job_id", "subcontractor_id"], name: "index_job_assignments_on_job_id_and_subcontractor_id", unique: true
+    t.index ["job_id"], name: "index_job_assignments_on_job_id"
+    t.index ["subcontractor_id"], name: "index_job_assignments_on_subcontractor_id"
+  end
+
   create_table "job_section_groups", force: :cascade do |t|
     t.integer "job_section_id", null: false
     t.integer "group_id", null: false
@@ -146,6 +159,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_084853) do
     t.string "public_token"
     t.string "status", default: "scheduled"
     t.datetime "snapshot_at"
+    t.integer "assigned_to_id"
+    t.index ["assigned_to_id"], name: "index_jobs_on_assigned_to_id"
     t.index ["checklist_id"], name: "index_jobs_on_checklist_id"
     t.index ["property_id"], name: "index_jobs_on_property_id"
     t.index ["public_token"], name: "index_jobs_on_public_token"
@@ -296,11 +311,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_15_084853) do
   add_foreign_key "contractor_subcontractors", "users", column: "subcontractor_id"
   add_foreign_key "groups", "organizations"
   add_foreign_key "invitations", "organizations"
+  add_foreign_key "job_assignments", "jobs"
+  add_foreign_key "job_assignments", "users", column: "assigned_by_id"
+  add_foreign_key "job_assignments", "users", column: "subcontractor_id"
   add_foreign_key "job_section_groups", "groups"
   add_foreign_key "job_section_groups", "job_sections"
   add_foreign_key "job_sections", "jobs"
   add_foreign_key "job_tasks", "job_section_groups"
   add_foreign_key "jobs", "checklists"
+  add_foreign_key "jobs", "memberships", column: "assigned_to_id"
   add_foreign_key "jobs", "properties"
   add_foreign_key "memberships", "organizations"
   add_foreign_key "memberships", "users"

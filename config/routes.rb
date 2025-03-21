@@ -73,8 +73,12 @@ Rails.application.routes.draw do
 
       patch :make_default_checklist, on: :member
       resources :jobs, only: [:index, :new, :create, :show] do
+        resources :job_assignments, only: [ :create]
+
 
       member do
+        post :assign   # Added assign action
+        delete :unassign # Added unassign action
           post :take_snapshot
       end
 
@@ -109,9 +113,17 @@ Rails.application.routes.draw do
 
   end
 
+  resources :job_assignments, only: [:destroy]
+
+
   # Public Job Sharing
   resources :job_shares, only: [:show], param: :public_token
-
+  resources :my_jobs, only: [:index, :show] do
+    member do
+      post :assign_subcontractor
+      delete :remove_subcontractor
+    end
+  end
   # Webhooks
   post "webhooks/stripe" => "webhooks#stripe"
 
