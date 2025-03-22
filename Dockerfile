@@ -61,9 +61,8 @@
 # CMD ["./bin/thrust", "./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
 
 # syntax=docker/dockerfile:1
-
 ARG RUBY_VERSION=3.3.1
-FROM ruby:$RUBY_VERSION-slim as base
+FROM ruby:$RUBY_VERSION-slim AS base
 
 # Set working directory inside the container
 WORKDIR /rails
@@ -77,7 +76,7 @@ ENV RAILS_ENV="production" \
 # ------------------------------
 # 🔨 Build Stage
 # ------------------------------
-FROM base as build
+FROM base AS build
 
 # Install packages required to build gems and run asset precompilation
 RUN apt-get update -qq && \
@@ -117,25 +116,30 @@ RUN apt-get update -qq && \
     redis && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Create non-root user for security
+# Create app user and ensure proper permissions
 RUN useradd rails
+
+# Ensure storage directory exists and is writable
+RUN mkdir -p /rails/storage && chown -R rails:rails /rails
+
+# Switch to non-root user for security
 USER rails:rails
 
-# Copy gems and application code from build stage
+# Copy built gems and code
 COPY --from=build --chown=rails:rails /usr/local/bundle /usr/local/bundle
 COPY --from=build --chown=rails:rails /rails /rails
 
-# Optionally include version info in environment
+# Set optional version info
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ARG GIT_REVISION
 ENV GIT_REVISION=$GIT_REVISION
 
-# Set up entrypoint (script should run migrations or prepare the app)
+# Entrypoint to setup or migrate DB etc
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Expose the port your app runs on
-EXPOSE 80
+# Expose app port
+EXPOSE 8080
 
-# Default command to run the server
+# Run the app
 CMD ["./bin/thrust", "./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
