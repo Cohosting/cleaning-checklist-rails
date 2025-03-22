@@ -138,4 +138,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 EXPOSE 80
 
 # Default command to run the server
-CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
+CMD ["./bin/thrust", "./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
