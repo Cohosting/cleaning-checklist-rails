@@ -97,13 +97,17 @@ RUN bundle install && \
 COPY . .
 
 # Optional: Precompile bootsnap cache for faster app boot
+# Precompile bootsnap
 RUN bundle exec bootsnap precompile app/ lib/
 
-# ✅ Build Tailwind CSS before asset precompilation
-RUN ./bin/rails tailwindcss:build
+# Set dummy secret
+ENV SECRET_KEY_BASE_DUMMY=dummytoken
 
-# Precompile assets (allow dummy secret in build phase)
-RUN SECRET_KEY_BASE=DUMMY ./bin/rails assets:precompile
+# Build Tailwind CSS (needs secret key)
+RUN SECRET_KEY_BASE=$SECRET_KEY_BASE_DUMMY ./bin/rails tailwindcss:build
+
+# Precompile assets (also needs secret key)
+RUN SECRET_KEY_BASE=$SECRET_KEY_BASE_DUMMY ./bin/rails assets:precompile
 
 # ------------------------------
 # 🏁 Final Runtime Image
