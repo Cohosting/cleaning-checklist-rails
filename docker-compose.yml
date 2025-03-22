@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     build:
@@ -16,7 +14,7 @@ services:
     volumes:
       - .:/rails
       - rails_storage:/rails/storage
-    user: "0" # 👈 Tem
+    user: "0"
     depends_on:
       - redis
 
@@ -26,4 +24,4 @@ services:
     restart: always
 
 volumes:
-  rails-db:
+  rails_storage: {}   # ✅ Make sure this is present
