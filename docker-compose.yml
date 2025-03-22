@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: my-rails-app
+    container_name: rails-cleaning-app
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: d04769767c98a1b767deabd1350cb0acf943e629e3fded5555477391d0932ba177f47f74e326d0e2ff7dd51a8b5495a09d6
+    volumes:
+      - rails-db:/rails/storage
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7
+    container_name: rails-cleaning-redis
+    restart: always
+
+volumes:
+  rails-db:

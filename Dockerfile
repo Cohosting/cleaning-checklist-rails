@@ -62,7 +62,7 @@
 
 # syntax=docker/dockerfile:1
 ARG RUBY_VERSION=3.3.1
-FROM ruby:$RUBY_VERSION-slim AS base
+FROM ruby:$RUBY_VERSION-slim as base
 
 # Set working directory inside the container
 WORKDIR /rails
@@ -76,7 +76,7 @@ ENV RAILS_ENV="production" \
 # ------------------------------
 # 🔨 Build Stage
 # ------------------------------
-FROM base AS build
+FROM base as build
 
 # Install packages required to build gems and run asset precompilation
 RUN apt-get update -qq && \
@@ -99,8 +99,8 @@ COPY . .
 # Optional: Precompile bootsnap cache for faster app boot
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Precompile assets without needing real secrets
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompile assets (allow dummy secret in build phase)
+RUN SECRET_KEY_BASE=DUMMY ./bin/rails assets:precompile
 
 # ------------------------------
 # 🏁 Final Runtime Image
@@ -116,30 +116,25 @@ RUN apt-get update -qq && \
     redis && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-# Create app user and ensure proper permissions
+# Create non-root user for security
 RUN useradd rails
-
-# Ensure storage directory exists and is writable
-RUN mkdir -p /rails/storage && chown -R rails:rails /rails
-
-# Switch to non-root user for security
 USER rails:rails
 
-# Copy built gems and code
+# Copy gems and application code from build stage
 COPY --from=build --chown=rails:rails /usr/local/bundle /usr/local/bundle
 COPY --from=build --chown=rails:rails /rails /rails
 
-# Set optional version info
+# Set environment version info (optional)
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ARG GIT_REVISION
 ENV GIT_REVISION=$GIT_REVISION
 
-# Entrypoint to setup or migrate DB etc
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
 # Expose app port
 EXPOSE 8080
 
-# Run the app
-CMD ["./bin/thrust", "./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
+# Set Docker entrypoint
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+
+# Start Rails server by default
+CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "8080"]
